@@ -4,6 +4,8 @@
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Prabin_SMS.web.Models;
+
 
 namespace Prabin_SMS.web.Areas.Identity.Pages.Account
 {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +9,9 @@ namespace Prabin_SMS.Models.Entity
 {
     public class StudentCourse
     {
+        public int StudentId { get; set; }
+        public int CourseId { get; set; }
+        public Student Student { get; set; }
+        public Course Course { get; set; }
     }
 }

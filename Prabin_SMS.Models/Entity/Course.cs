@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace Prabin_SMS.Models.Entity
 {
-    public class Course
+    public class Course:BaseEntity
     {
-        public int Id { get; set; }
         public string CourseName { get; set; }
-
-        public Student StudentId {  get; set; }
         public IEnumerable<Student> Students{  get; set; }
+        public IEnumerable<StudentCourse> StudentCourses { get; set; }
 
     }
 }

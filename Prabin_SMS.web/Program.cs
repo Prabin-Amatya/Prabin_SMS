@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Prabin_SMS.Infrastructure;
 using Prabin_SMS.web.Data;
 using Prabin_SMS.web.Models;
 
@@ -8,9 +9,9 @@ var ApplicationDb = builder.Configuration.GetConnectionString("ApplicationDbCont
 
 //var connectionString = builder.Configuration.GetConnectionString("Prabin_SMSwebContextConnection") ?? throw new InvalidOperationException("Connection string 'Prabin_SMSwebContextConnection' not found.");
 
-builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ApplicationDb));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(ApplicationDb, e => e.MigrationsAssembly("Prabin_SMS.web")));
 
-//builder.Services.AddDbContext<SMSDbContext>(options => options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<SMSDbContext>(options => options.UseSqlServer(ApplicationDb));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<ApplicationDbContext>();
 
@@ -39,7 +40,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
+app.MapRazorPages();
 app.UseAuthorization();
 
 app.MapControllerRoute(

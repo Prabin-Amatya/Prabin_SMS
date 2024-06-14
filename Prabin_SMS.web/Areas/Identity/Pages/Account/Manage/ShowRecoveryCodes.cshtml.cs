@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Prabin_SMS.web.Models;
+
 
 namespace Prabin_SMS.web.Areas.Identity.Pages.Account.Manage
 {
