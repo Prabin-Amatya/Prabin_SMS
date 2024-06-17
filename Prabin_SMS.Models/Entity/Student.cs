@@ -13,20 +13,25 @@ namespace Prabin_SMS.Models.Entity
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
+        public string Address { get; set; }
         public string PhoneNumber { get; set; }
-        public string Class {  get; set; }
-        public string Section {  get; set; }
-        
-        public string studenturl {  get; set; }
+        public int Batch {  get; set; }
+        public int? Semester { get; set; }
+        public int? SectionId {  get; set; }
+        public bool IsEnrolled { get; set; }
+        public string? studenturl {  get; set; }
 
         [NotMapped]
         public IFormFile studentPhoto {  get; set; }
-
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
+        public int DegreeId { get; set; }
+        public Degree Degree { get; set; }
         public IEnumerable<Course> Courses { get; set; }
+        public IEnumerable<Teacher> Teachers { get; set; }
         public IEnumerable<StudentCourse> StudentCourses { get; set; }
+        public IEnumerable<TeacherStudent> TeacherStudents { get; set; }
     }
 }

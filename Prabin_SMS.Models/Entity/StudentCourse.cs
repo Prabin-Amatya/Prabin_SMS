@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Prabin_SMS.Models.Entity
 {
-    public class StudentCourse
+    public class StudentCourse : BaseEntity
     {
         public int StudentId { get; set; }
         public int CourseId { get; set; }

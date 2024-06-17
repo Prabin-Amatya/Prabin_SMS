@@ -19,11 +19,6 @@ namespace Prabin_SMS.web.Data
                .HasMaxLength(100);
 
             builder.Entity<ApplicationUser>()
-               .Property(p => p.MiddleName)
-               .IsRequired()
-               .HasMaxLength(100);
-
-            builder.Entity<ApplicationUser>()
                .Property(p => p.LastName)
                .IsRequired()
                .HasMaxLength(100);

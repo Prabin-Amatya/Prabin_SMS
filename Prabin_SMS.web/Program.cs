@@ -1,6 +1,12 @@
+using IMS.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+
 using Prabin_SMS.Infrastructure;
+using Prabin_SMS.Infrastructure.IRepository;
+using Prabin_SMS.Infrastructure.Repository;
+using Prabin_SMS.Infrastructure.Repository.CRUDServices;
 using Prabin_SMS.web.Data;
 using Prabin_SMS.web.Models;
 
@@ -15,10 +21,19 @@ builder.Services.AddDbContext<SMSDbContext>(options => options.UseSqlServer(Appl
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddDefaultTokenProviders().AddEntityFrameworkStores<ApplicationDbContext>();
 
-
+builder.Services.AddSingleton<IEmailSender, EmailSender>();
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddTransient(typeof(ICRUDServices<>), typeof(CRUDServices<>));
+builder.Services.AddTransient(typeof(IRawSqlRepository), typeof(RawSqlRepository));
 
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+builder.Services.ConfigureApplicationCookie(option =>
+    {
+        option.LoginPath = $"/Identity/Account/Login";
+        option.LogoutPath = $"/Identity/Account/Logout";
+        option.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+    });
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
@@ -40,8 +55,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.MapRazorPages();
 app.UseAuthorization();
+app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",

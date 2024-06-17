@@ -57,7 +57,7 @@ namespace Prabin_SMS.Infrastructure.Repository.CRUDServices
 
         public async Task<int> DeleteAsync(TEntity entity)
         {
-            var result = _smsDbContext.Set<TEntity>().Update(entity);
+            var result = _smsDbContext.Set<TEntity>().Remove(entity);
             await _smsDbContext.SaveChangesAsync();
             return result.Entity.Id;
         }

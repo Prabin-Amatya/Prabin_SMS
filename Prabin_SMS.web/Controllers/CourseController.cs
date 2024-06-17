@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Prabin_SMS.Infrastructure.IRepository;
 using Prabin_SMS.Models.Entity;
+using Prabin_SMS.web.Models;
 
 namespace Prabin_SMS.web.Controllers
 {
@@ -8,15 +12,64 @@ namespace Prabin_SMS.web.Controllers
     {
         private readonly ICRUDServices<Course> _course;
         private readonly ICRUDServices<Student> _student;
+        private readonly ICRUDServices<Degree> _degree;
+        private readonly ICRUDServices<Teacher> _teacher;
+        private readonly UserManager<ApplicationUser> _user;
         private readonly ICRUDServices<StudentCourse> _studentCourse;
+
+        public CourseController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<StudentCourse> studentCourse, ICRUDServices<Degree> degree, ICRUDServices<Teacher> teacher)
+        {
+            _course = course;
+            _student = student;
+            _user = user;
+            _studentCourse = studentCourse;
+            _degree = degree;
+            _teacher = teacher;
+        }
 
         public async Task<IActionResult> Index()
         {
             var course =await _course.GetAllAsync();
-            ViewBag.student = _student.GetAllAsync();
-
-
             return View(course);
+        }
+        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> AddEdit(int id)
+        {
+            Course course = new Course();
+            if (id != 0)
+            {
+               course =  await _course.GetAsync(id);
+            }
+            return View(course);
+
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddEdit(Course course)
+        {
+            var UserId = _user.GetUserId(HttpContext.User);
+            if (course.Id==0)
+            {
+                course.CreatedBy = UserId;
+                course.CreatedDate = DateTime.Now;
+                await _course.InsertAsync(course);
+            }
+            else if(course.Id != 0)
+            {
+                Course updated_course =await _course.GetAsync(course.Id);
+                updated_course.IsActive = course.IsActive;
+                updated_course .IsOptional = course.IsOptional;
+                updated_course.CourseName = course.CourseName;
+                updated_course.CourseDescription = course.CourseDescription;
+                updated_course.CreditHours = course.CreditHours;
+                updated_course.FullMarks = course.FullMarks;
+                updated_course.ModifiedDate = DateTime.Now;
+                updated_course.ModifiedBy = UserId;
+                await _course.UpdateAsync(updated_course);
+            }
+
+            return RedirectToAction(nameof(Index));
+
         }
 
 

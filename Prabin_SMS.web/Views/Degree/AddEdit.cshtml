@@ -1,0 +1,132 @@
+﻿@model Prabin_SMS.Models.Entity.Degree
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+
+
+<h1>@ViewData["Title"]</h1>
+<h2>Create a new account.</h2>
+<hr />
+
+
+
+
+<form action="AddEdit" method="post">
+    <input asp-for="Id" hidden />
+    <div class="row">
+        <div class="col-6">
+            <div class="form-floating">
+                <input asp-for="DegreeName" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="DegreeName"></label>
+                <span asp-validation-for="DegreeName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="form-floating">
+                <input asp-for="DegreeDescription" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="DegreeDescription"></label>
+                <span asp-validation-for="DegreeDescription" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+                <div class="form-floating">
+                    <select asp-for="DisciplineId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(new SelectList(ViewBag.Discipline,"Id","Name"))">
+                        <option disabled selected value="null">--CHOOSE</option>
+                    </select>
+                    <label asp-for="DisciplineId"></label>
+                    <span asp-validation-for="DisciplineId" class="text-danger"></span>
+                </div>
+        </div>
+        <div class="col-6">
+            <div class="form-floating">
+                <select asp-for="Academic_Level" class="form-control" autocomplete="username" aria-required="true">
+                    <option disabled selected value="null">--CHOOSE--</option>
+                    <option  value="MASTERS">MASTERS</option>
+                    <option  value="BACHELORS">BACHELORS</option>
+                </select>
+                <label asp-for="Academic_Level"></label>
+                <span asp-validation-for="Academic_Level" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-floating">
+                <input asp-for="No_Of_Semesters" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="No_Of_Semesters"></label>
+                <span asp-validation-for="No_Of_Semesters" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="form-floating">
+                <input asp-for="No_Of_Years" class="form-control" autocomplete="username" aria-required="true" />
+                <label asp-for="No_Of_Years"></label>
+                <span asp-validation-for="No_Of_Years" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="col-6">
+            <label for="StartDate" style="font-size: 0.9rem;
+                                            color: #7a7a7ac2;
+                                            padding-left: 3.2%;
+                                            ">StartDate</label>
+            <input asp-for="StartDate" type="date" class="form-control" autocomplete="username" aria-required="true" style="padding-top: 20px;
+                                                                                                                            margin-top: -24px;
+                                                                                                                            border-color: #816d6d30;
+                                                                                                                            height: 9vh;
+                                                                                                                            width: 64%;" />
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+          
+        
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <div class="form-group">
+                <input class="form-check-input" type="checkbox" asp-for="IsActive">
+                <label class="form-check-label" asp-for="IsActive">
+
+                </label>
+                <span asp-validation-for="IsActive" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    
+
+
+    <div class="row">
+        <div class="col-6">
+            <button asp-action="Index" type="submit" class="w-100 btn btn-lg btn-primary">Back</button>
+        </div>
+        @if (User.IsInRole("ADMIN")) { 
+
+            @if (Model.Id > 0)
+            {
+                <div class="col-6">
+                    <button class="w-100 btn btn-lg btn-primary  float-end" type="submit">Update</button>
+                </div>
+            }
+            else
+            {
+                <div class="col-6">
+                    <button class="w-100 btn btn-lg btn-primary  float-end" type="submit">Create</button>
+                </div>
+            }
+       
+        }
+    </div>
+</form>
+
+
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

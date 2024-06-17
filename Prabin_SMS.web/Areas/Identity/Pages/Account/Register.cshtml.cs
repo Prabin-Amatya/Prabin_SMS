@@ -144,8 +144,8 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
                 user.IsActive = true;
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-                user.MiddleName = Input.MiddleName;
-                user.profileUrl = Input.profileUrl;
+                user.Address = Input.Address;
+                user.ProfileUrl = Input.profileUrl;
                 user.CreatedBy = Ad_user.Id;
                 user.CreatedDate = DateTime.Now;
               

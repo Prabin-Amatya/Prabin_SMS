@@ -42,7 +42,7 @@ namespace Prabin_SMS.Infrastructure.IRepository
 
         Task<TEntity> QueryAsync(string commandText, object param = null, CommandType commandType = CommandType.Text);
 
-        IEnumerable<Task<TEntity>> QueryListAsync(string commandText, object param = null, CommandType commandType = CommandType.Text);
+        Task<IEnumerable<object>> QueryListAsync(string commandText, object param = null, CommandType commandType = CommandType.Text);
 
     }
 } 

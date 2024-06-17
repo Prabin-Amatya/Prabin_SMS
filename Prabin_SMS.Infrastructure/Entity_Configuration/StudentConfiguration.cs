@@ -32,17 +32,20 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                 .HasMaxLength(100)
                 .IsRequired();
 
-            builder.Property(p => p.Class)
-                .HasMaxLength(100)
+            builder.Property(p => p.Batch)
                 .IsRequired();
 
-            builder.Property(p => p.Section)
+            builder.Property(p => p.SectionId)
                 .HasMaxLength(100)
-                .IsRequired();
+                .IsRequired(false);
+
+            builder.Property(p => p.Semester)
+                .HasMaxLength(100)
+                .IsRequired(false);
 
             builder.Property(p => p.studenturl)
                 .HasMaxLength(100)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(p => p.CreatedDate)
                .IsRequired()
@@ -53,14 +56,16 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                .IsRequired()
                .HasDefaultValueSql("GETDATE()")
                .HasColumnType("DATETIME");
+            
 
-            //builder.HasMany(e => e.Courses)
-            //    .WithMany(e => e.Students)
-            //    .UsingEntity<StudentCourse>(
-            //     l => l.HasOne(e => e.Course).WithMany(e => e.StudentCourses).HasForeignKey(e=>e.CourseId).OnDelete(DeleteBehavior.Restrict),
-            //    r => r.HasOne(e => e.Student).WithMany(e => e.StudentCourses).HasForeignKey(e => e.StudentId).OnDelete(DeleteBehavior.Restrict));
+            builder.Property(p => p.studenturl)
+               .IsRequired(false);
 
 
+            builder.HasOne(e => e.Degree)
+                 .WithMany(e => e.Students)
+                 .HasForeignKey(e => e.DegreeId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

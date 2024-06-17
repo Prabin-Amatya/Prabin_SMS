@@ -12,7 +12,7 @@ using Prabin_SMS.web.Data;
 namespace Prabin_SMS.web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240612110806_initial")]
+    [Migration("20240615120824_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -266,11 +266,6 @@ namespace Prabin_SMS.web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("MiddleName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("ModifiedBy")
                         .HasColumnType("nvarchar(max)");
 
@@ -280,10 +275,12 @@ namespace Prabin_SMS.web.Migrations
                         .HasColumnType("DATETIME")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<int>("UserRoleId")
-                        .HasColumnType("int");
+                    b.Property<string>("ProfileUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("profileUrl")
+                    b.Property<string>("UserRoleId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");

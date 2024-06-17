@@ -12,7 +12,7 @@ using System.Reflection.Emit;
 
 namespace Prabin_SMS.Infrastructure.Entity_Configuration
 {
-    public class CourseConfiguration:IEntityTypeConfiguration<Course>
+    public class CourseConfiguration : IEntityTypeConfiguration<Course>
     {
         public void Configure(EntityTypeBuilder<Course> builder)
         {
@@ -23,14 +23,31 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                 .HasMaxLength(100)
                 .IsRequired();
 
+            builder.Property(p => p.IsOptional)
+                .IsRequired();
 
+            builder.Property(p => p.CreditHours)
+                .IsRequired();
+
+            builder.Property(p => p.FullMarks)
+                .IsRequired();
+
+            builder.Property(p => p.CreatedDate)
+             .IsRequired()
+             .HasDefaultValueSql("GETDATE()")
+             .HasColumnType("DATETIME");
+
+            builder.Property(p => p.ModifiedDate)
+               .IsRequired()
+               .HasDefaultValueSql("GETDATE()")
+               .HasColumnType("DATETIME");
             builder.HasMany(e => e.Students)
                 .WithMany(e => e.Courses)
                 .UsingEntity<StudentCourse>(
-                l => l.HasOne(e => e.Student).WithMany(e => e.StudentCourses).HasForeignKey(e => e.StudentId).OnDelete(DeleteBehavior.Cascade),
-                r => r.HasOne(e => e.Course).WithMany(e => e.StudentCourses).HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Cascade)
+                l => l.HasOne(e => e.Student).WithMany(e => e.StudentCourses).HasForeignKey(e => e.StudentId).OnDelete(DeleteBehavior.Restrict),
+                r => r.HasOne(e => e.Course).WithMany(e => e.StudentCourses).HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Restrict)
                 );
-        
+
 
         }
     }
