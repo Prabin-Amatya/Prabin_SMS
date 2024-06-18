@@ -15,6 +15,8 @@ namespace Prabin_SMS.Models.Entity
         public int No_Of_Semesters {  get; set; }
         public int No_Of_Years { get; set; }
         public bool IsActive { get; set; }
+        public int TotalSeats {  get; set; }
+        public int RemainingSeats { get; set; }
         [Column(TypeName="DATE")]
         public DateTime StartDate { get; set; }
         public DateTime CreatedDate { get; set; }

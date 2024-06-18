@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Prabin_SMS.web.Models
 {
@@ -38,6 +39,8 @@ namespace Prabin_SMS.web.Models
         //public string PhoneNumber { get; set; }
         public string UserRoleId { get; set; }
         public string? profileUrl { get; set; }
+        [NotMapped]
+        public IFormFile? profileData { get; set; }
 
         public string? Code { get; set; }
         public string? Id { get; set; }

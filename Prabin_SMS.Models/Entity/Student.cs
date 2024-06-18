@@ -20,9 +20,14 @@ namespace Prabin_SMS.Models.Entity
         public int? SectionId {  get; set; }
         public bool IsEnrolled { get; set; }
         public string? studenturl {  get; set; }
-
+        public string? transcriptPhotoUrl { get; set; }
+        public string? citizenshipPhotoUrl { get; set; }
         [NotMapped]
         public IFormFile studentPhoto {  get; set; }
+        [NotMapped]
+        public IFormFile transcriptPhoto { get; set; }
+        [NotMapped]
+        public IFormFile citizenshipPhoto { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }

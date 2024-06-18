@@ -60,6 +60,10 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
 
             builder.Property(p => p.studenturl)
                .IsRequired(false);
+            builder.Property(p => p.transcriptPhotoUrl)
+              .IsRequired(false);
+            builder.Property(p => p.citizenshipPhotoUrl)
+              .IsRequired(false);
 
 
             builder.HasOne(e => e.Degree)

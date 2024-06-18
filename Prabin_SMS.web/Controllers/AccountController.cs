@@ -79,6 +79,25 @@ namespace Prabin_SMS.web.Controllers
             var Ad_user = await _user.FindByIdAsync(Ad_userId);
             if (ModelState.IsValid)
             {
+                if (registerViewModel.profileUrl != null)
+                {
+                    string fileDirectory = $"wwwroot/ProfileImage";
+
+                    if (!Directory.Exists(fileDirectory))
+                    {
+                        Directory.CreateDirectory(fileDirectory);
+                    }
+                    string uniqueFileName = Guid.NewGuid() + "_" + registerViewModel.profileData.FileName;
+                    string filePath = Path.Combine(Path.GetFullPath($"wwwroot/ProfileImage"), uniqueFileName);
+
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await registerViewModel.profileData.CopyToAsync(fileStream);
+                        registerViewModel.profileUrl = $"ProfileImage/" + uniqueFileName;
+                    }
+
+                }
+
                 var user = CreateUser();
                 user.IsActive = true;
                 user.FirstName = registerViewModel.FirstName;

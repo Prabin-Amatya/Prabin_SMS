@@ -125,8 +125,14 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Property<int>("No_Of_Years")
                         .HasColumnType("int");
 
+                    b.Property<int>("RemainingSeats")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("DATE");
+
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

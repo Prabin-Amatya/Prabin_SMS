@@ -26,6 +26,7 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
             builder.Property(p => p.No_Of_Semesters)
                 .IsRequired();
 
+
             builder.HasMany(e => e.Students)
                 .WithOne(e => e.Degree)
                 .HasForeignKey(e => e.DegreeId);
@@ -33,6 +34,7 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
             builder.HasOne(e => e.Discipline)
                  .WithMany(e => e.Degrees)
                  .HasForeignKey(e => e.DisciplineId);
+
 
             builder.Property(p => p.StartDate)
              .HasColumnType("DATE");

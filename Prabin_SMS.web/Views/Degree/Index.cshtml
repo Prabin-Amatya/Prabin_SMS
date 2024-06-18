@@ -21,21 +21,11 @@
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>S.N.</th>
                     <th>
                         Degree Name
                     </th>
                     <th>
                         Degree Description
-                    </th>
-                    <th>
-                        Discipline
-                    </th>
-                    <th>
-                        Academic Level
-                    </th>
-                    <th>
-                        Total Semesters
                     </th>
                     <th>
                         Total Years
@@ -44,25 +34,28 @@
                         Start Date
                     </th>
                     <th>
-                        Active
+                        Available Seats
                     </th>
                     @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
                     {
-                        <th></th>
+                    <th>
+                        Active
+                    </th>
+                    <th></th>
                     }
 
                 </tr>
             </thead>
             <tbody>
                 @{
-                    int count = 1;
+                    int occupied = Model.Count();
+
                 }
+                
                 @foreach (var items in Model)
                 {
+                   
                     <tr>
-                        <td>
-                            @count
-                        </td>
                         <td>
                             @items.DegreeName
                         </td>
@@ -70,38 +63,42 @@
                             @items.DegreeDescription
                         </td>
                         <td>
-                            @items.Discipline
-                        </td>
-                        <td>
-                            @items.Academic_Level
-                        </td>
-                        <td>
-                            @items.No_Of_Semesters
-                        </td>
-                        <td>
                             @items.No_Of_Years
                         </td>
                         <td>
-                            @items.StartDate
+                            @items.StartDate.ToShortDateString()
+                            
                         </td>
                         <td>
-                            @if (items.IsActive == true)
-                            {
-                                @:Active
-                            }
-                            else
-                            {
-                                @:Deactive
-                            }
+                            @items.RemainingSeats/@items.TotalSeats 
                         </td>
+                        
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
+                        {
+                            <td>
+                                @if (items.IsActive == true)
+                                {
+                                    @:Active
+                                }
+                                else
+                                {
+                                    @:Deactive
+                                }
+                            </td>
+                        }
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
                         {
                             <td>
                                 <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Edit</a>
                             </td>
                         }
+                        @if(!SignInManager.IsSignedIn(User))
+                        {
+                            <td>
+                                <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Enroll</a>
+                            </td>
+                        }
                     </tr>
-                    count = count + 1;
                 }
             </tbody>
         </table>

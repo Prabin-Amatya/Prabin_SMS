@@ -13,7 +13,6 @@ namespace Prabin_SMS.Models.Entity
         public int CreditHours { get; set; }
         public int FullMarks { get; set; }
         public bool IsActive { get; set; }
-        public bool IsOptional { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }

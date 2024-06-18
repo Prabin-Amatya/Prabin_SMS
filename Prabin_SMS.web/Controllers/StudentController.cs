@@ -54,6 +54,63 @@ namespace Prabin_SMS.web.Controllers
         {
             ViewBag.DegreeList = await _degree.GetAllAsync();
             var UserId = _user.GetUserId(HttpContext.User);
+
+            if (student.studentPhoto != null)
+            {
+                string fileDirectory = $"wwwroot/StudentImage";
+
+                if (!Directory.Exists(fileDirectory))
+                {
+                    Directory.CreateDirectory(fileDirectory);
+                }
+                string uniqueFileName = Guid.NewGuid() + "_" + student.studentPhoto.FileName;
+                string filePath = Path.Combine(Path.GetFullPath($"wwwroot/StudentImage"), uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await student.studentPhoto.CopyToAsync(fileStream);
+                    student.studenturl = $"StudentImage/" + uniqueFileName;
+                }
+
+            }
+
+            if (student.transcriptPhoto != null)
+            {
+                string fileDirectory = $"wwwroot/TranscriptImage";
+
+                if (!Directory.Exists(fileDirectory))
+                {
+                    Directory.CreateDirectory(fileDirectory);
+                }
+                string uniqueFileName = Guid.NewGuid() + "_" + student.transcriptPhoto.FileName;
+                string filePath = Path.Combine(Path.GetFullPath($"wwwroot/TranscriptImage"), uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await student.transcriptPhoto.CopyToAsync(fileStream);
+                    student.transcriptPhotoUrl = $"TranscriptImage/" + uniqueFileName;
+                }
+            }
+
+            if (student.citizenshipPhoto != null)
+            {
+                string fileDirectory = $"wwwroot/citizenshipPhotoImage";
+
+                if (!Directory.Exists(fileDirectory))
+                {
+                    Directory.CreateDirectory(fileDirectory);
+                }
+                string uniqueFileName = Guid.NewGuid() + "_" + student.citizenshipPhoto.FileName;
+                string filePath = Path.Combine(Path.GetFullPath($"wwwroot/citizenshipPhotoImage"), uniqueFileName);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await student.citizenshipPhoto.CopyToAsync(fileStream);
+                    student.citizenshipPhotoUrl = $"citizenshipPhotoImage/" + uniqueFileName;
+                }
+
+            }
+
             if (student.Id == 0)
             {
                 student.CreatedBy = UserId;

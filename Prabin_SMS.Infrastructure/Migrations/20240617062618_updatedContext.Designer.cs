@@ -12,8 +12,8 @@ using Prabin_SMS.Infrastructure;
 namespace Prabin_SMS.Infrastructure.Migrations
 {
     [DbContext(typeof(SMSDbContext))]
-    [Migration("20240616195650_updateTime_Table")]
-    partial class updateTime_Table
+    [Migration("20240617062618_updatedContext")]
+    partial class updatedContext
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,8 +128,14 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Property<int>("No_Of_Years")
                         .HasColumnType("int");
 
+                    b.Property<int>("RemainingSeats")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("DATE");
+
+                    b.Property<int>("TotalSeats")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -150,6 +156,9 @@ namespace Prabin_SMS.Infrastructure.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("DegreeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Semester")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -360,6 +369,31 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.ToTable("Teacher");
                 });
 
+            modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan?>("EndTime")
+                        .HasColumnType("time");
+
+                    b.Property<int?>("Section")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Semester")
+                        .HasColumnType("int");
+
+                    b.Property<TimeSpan?>("StartTime")
+                        .HasColumnType("time");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TeacherClass");
+                });
+
             modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherCourse", b =>
                 {
                     b.Property<int>("Id")
@@ -394,18 +428,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Property<int>("DegreeId")
                         .HasColumnType("int");
 
-                    b.Property<TimeSpan?>("EndTime")
-                        .HasColumnType("TIME");
-
-                    b.Property<int?>("Section")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("Semester")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan?>("StartTime")
-                        .HasColumnType("TIME");
-
                     b.Property<int>("TeacherId")
                         .HasColumnType("int");
 
@@ -416,6 +438,29 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.HasIndex("DegreeId");
 
                     b.ToTable("TeacherDegree");
+                });
+
+            modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherDegreeClass", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("TeacherClassId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherDegreeId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherClassId");
+
+                    b.HasIndex("TeacherDegreeId");
+
+                    b.ToTable("TeacherDegreeClass");
                 });
 
             modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherStudent", b =>
@@ -439,6 +484,21 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.HasIndex("StudentId");
 
                     b.ToTable("TeacherStudent");
+                });
+
+            modelBuilder.Entity("TeacherClassTeacherDegree", b =>
+                {
+                    b.Property<int>("TeacherClassesId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherDegreesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TeacherClassesId", "TeacherDegreesId");
+
+                    b.HasIndex("TeacherDegreesId");
+
+                    b.ToTable("TeacherClassTeacherDegree");
                 });
 
             modelBuilder.Entity("Prabin_SMS.Models.Entity.Degree", b =>
@@ -539,6 +599,25 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Navigation("Teacher");
                 });
 
+            modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherDegreeClass", b =>
+                {
+                    b.HasOne("Prabin_SMS.Models.Entity.TeacherClass", "TeacherClass")
+                        .WithMany("TeacherDegreeClasses")
+                        .HasForeignKey("TeacherClassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Prabin_SMS.Models.Entity.TeacherDegree", "TeacherDegree")
+                        .WithMany("TeacherDegreeClasses")
+                        .HasForeignKey("TeacherDegreeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("TeacherClass");
+
+                    b.Navigation("TeacherDegree");
+                });
+
             modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherStudent", b =>
                 {
                     b.HasOne("Prabin_SMS.Models.Entity.Student", "Student")
@@ -556,6 +635,21 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Navigation("Student");
 
                     b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("TeacherClassTeacherDegree", b =>
+                {
+                    b.HasOne("Prabin_SMS.Models.Entity.TeacherClass", null)
+                        .WithMany()
+                        .HasForeignKey("TeacherClassesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Prabin_SMS.Models.Entity.TeacherDegree", null)
+                        .WithMany()
+                        .HasForeignKey("TeacherDegreesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Prabin_SMS.Models.Entity.Course", b =>
@@ -595,6 +689,16 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     b.Navigation("TeacherDegrees");
 
                     b.Navigation("TeacherStudents");
+                });
+
+            modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherClass", b =>
+                {
+                    b.Navigation("TeacherDegreeClasses");
+                });
+
+            modelBuilder.Entity("Prabin_SMS.Models.Entity.TeacherDegree", b =>
+                {
+                    b.Navigation("TeacherDegreeClasses");
                 });
 #pragma warning restore 612, 618
         }

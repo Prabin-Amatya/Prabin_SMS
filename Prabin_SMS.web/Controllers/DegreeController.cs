@@ -1,10 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Prabin_SMS.Infrastructure.IRepository;
 using Prabin_SMS.Models.Entity;
+using Prabin_SMS.Models.ViewModels;
 using Prabin_SMS.web.Models;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace Prabin_SMS.web.Controllers
 {
@@ -16,22 +21,23 @@ namespace Prabin_SMS.web.Controllers
         private readonly ICRUDServices<Degree> _degree;
         private readonly ICRUDServices<Discipline> _discipline;
         private readonly UserManager<ApplicationUser> _user;
-        private readonly ICRUDServices<StudentCourse> _studentCourse;
+        private readonly ICRUDServices<DegreeCourse> _DegreeCourse;
 
-        public DegreeController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<StudentCourse> studentCourse, ICRUDServices<Teacher> teacher, ICRUDServices<Degree> degree, ICRUDServices<Discipline> discipline)
+        public DegreeController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<StudentCourse> studentCourse, ICRUDServices<Teacher> teacher, ICRUDServices<Degree> degree, ICRUDServices<Discipline> discipline, ICRUDServices<DegreeCourse> degreeCourse)
         {
             _course = course;
             _student = student;
             _user = user;
-            _studentCourse = studentCourse;
             _teacher = teacher;
             _degree = degree;
             _discipline = discipline;
+            _DegreeCourse = degreeCourse;
         }
 
         public async Task<IActionResult> Index()
         {
             ViewBag.Discipline = await _discipline.GetAllAsync();
+            ViewBag.Course = await _course.GetAllAsync();
             var degree = await _degree.GetAllAsync();
             return View(degree);
         }
@@ -70,6 +76,8 @@ namespace Prabin_SMS.web.Controllers
                 updated_degree.Academic_Level = degree.Academic_Level;
                 updated_degree.No_Of_Semesters = degree.No_Of_Semesters;
                 updated_degree.No_Of_Years = degree.No_Of_Years;
+                updated_degree.TotalSeats = degree.TotalSeats;
+                updated_degree.RemainingSeats = degree.RemainingSeats;
                 updated_degree.ModifiedDate = DateTime.Now;
                 updated_degree.ModifiedBy = UserId;
                 await _degree.UpdateAsync(updated_degree);
@@ -77,6 +85,85 @@ namespace Prabin_SMS.web.Controllers
 
             return RedirectToAction(nameof(Index));
 
+        }
+
+        [HttpGet]
+        [Route("api/Degree/getAllCourses")]
+        public async Task<IActionResult> getAllCourses(string query)
+        {
+            query = Regex.Escape(query);
+            CourseSearchViewModel courseSearchViewModel = new CourseSearchViewModel();
+            try
+            {
+                var courses = await _course.GetAllAsync();
+
+                // In-memory filtering using Regex
+                var filteredCourses = courses
+                    .Where(p => Regex.IsMatch(p.CourseName, "^" + Regex.Escape(query) + ".*$", RegexOptions.IgnoreCase))
+                    .ToList();
+                courseSearchViewModel.Courses = filteredCourses;
+            }
+            catch(Exception ex)
+            {
+
+            }
+            return Json(new { courseSearchViewModel.Courses });
+        }
+
+        [HttpPost]
+        [Route("api/Degree/getSemesterCourses")]
+        public async Task<IActionResult> getSemesterCourses(CourseSearchViewModel courseSearchViewModel)
+        {try
+            {
+                var courseList = new List<CourseResultViewModel>();
+                if (courseSearchViewModel.DegreeId != 0)
+                {
+                    var courseIds = await _DegreeCourse.GetAllAsync(p => p.DegreeId == courseSearchViewModel.DegreeId && p.Semester == courseSearchViewModel.Semester);
+                
+                    foreach (var courseId in courseIds)
+                    {
+                            CourseResultViewModel courseResultViewModel = new CourseResultViewModel();
+                            var course = await _course.GetAsync(p => p.Id == courseId.CourseId);
+                            courseResultViewModel.Id = course.Id;
+                            courseResultViewModel.CourseName = course.CourseName;
+                            courseList.Add(courseResultViewModel);
+                    }
+                }
+                return Json(new { courseList });
+
+            }
+            catch(Exception ex) { return Json(new { courseSearchViewModel.Courses }); }
+        }
+
+        [HttpPost]
+        [Route("api/Degree/setCourse")]
+        public async Task<IActionResult> setCourse(CourseSearchViewModel courseSearchViewModel)
+        {
+            DegreeCourse degreeCourse = new DegreeCourse();
+            degreeCourse.CourseId = courseSearchViewModel.CourseId;
+            degreeCourse.DegreeId = courseSearchViewModel.DegreeId;
+            degreeCourse.Semester = courseSearchViewModel.Semester;
+            var result =await _DegreeCourse.InsertAsync(degreeCourse);
+            return Json(new{ result});
+        }
+
+        [HttpPost]
+        [Route("api/Degree/DeleteCourse")]
+        public async Task<IActionResult> DeleteCourse(CourseSearchViewModel courseSearchViewModel)
+        {
+            var degreeCourse= await _DegreeCourse.GetAsync(p => p.DegreeId == courseSearchViewModel.DegreeId && p.Semester == courseSearchViewModel.Semester && p.CourseId == courseSearchViewModel.CourseId);
+
+            var result =  _DegreeCourse.Delete(degreeCourse);
+            return Json(new { result });
+        }
+
+        [HttpGet]
+        [Route("api/Degree/getRemainingSeats")]
+        public async Task<IActionResult> getRemainingSeats(int totalCount)
+        { 
+            var occupiedSeats = await _student.GetAllAsync();
+            var Count = occupiedSeats.Count();
+            return Json(new { Count });
         }
 
 

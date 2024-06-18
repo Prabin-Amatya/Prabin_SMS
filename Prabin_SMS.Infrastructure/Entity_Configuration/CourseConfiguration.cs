@@ -23,9 +23,6 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                 .HasMaxLength(100)
                 .IsRequired();
 
-            builder.Property(p => p.IsOptional)
-                .IsRequired();
-
             builder.Property(p => p.CreditHours)
                 .IsRequired();
 

@@ -12,9 +12,8 @@
 <hr />
 
 
-<form action="AddEdit" method="post">
+<form action="AddEdit" method="post" enctype="multipart/form-data">
     <div class="row">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="col-4">
             <div class="form-floating">
                 <input asp-for="FirstName" class="form-control" autocomplete="username" aria-required="true" />
@@ -29,6 +28,36 @@
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
         </div>
+    
+        <div class="row">
+            <div class="col-4">
+                <div class="image-uploaded">
+                    @if (!string.IsNullOrEmpty(Model?.studenturl))
+                    {
+                        <img src="/@Model?.studenturl" id="StudentPhoto" class="img-thumbnail align-center" style="height:200px;width:180px;" />
+                    }
+                    else
+                    {
+                        <img id="ErrorPhoto" src="~/images/errorphoto.jpg" class="img-thumbnail align-center " style="height:200px;width:180px;">
+                    }
+
+                </div>
+
+                <div class="input-group input-file mt-1">
+                    <label class="input-group-btn ">
+                        <span class="btn btn-large btn-primary">
+                            Upload Photo
+                            <input asp-for="studentPhoto" class="form-control" onchange="readURL(this, '@Model?.studenturl')" style="display: none;" />
+                            <span asp-validation-for="studentPhoto" class="text-danger"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="row">
         <div class="col-4">
             <div class="form-floating">
                 <input asp-for="Email" class="form-control" autocomplete="username" aria-required="true" />
@@ -36,9 +65,6 @@
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
         </div>
-    </div>
-
-    <div class="row">
         <div class="col-4">
             <div class="form-floating">
                 <input asp-for="Address" class="form-control" autocomplete="username" aria-required="true" />
@@ -55,6 +81,10 @@
             </div>
         </div>
 
+        
+    </div>
+
+    <div class="row">
         <div class="col-4">
             <div class="form-floating">
                 <input asp-for="PhoneNumber" class="form-control" autocomplete="username" aria-required="true" />
@@ -62,9 +92,6 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
         </div>
-    </div>
-
-    <div class="row">
         <div class="col-4">
             <div class="form-floating">
                 <select asp-for="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
@@ -81,27 +108,71 @@
                 <span asp-validation-for="Semester" class="text-danger"></span>
             </div>
         </div>
-        <div class="col-4">
-                <div class="form-group">
-                    <input class="form-check-input" type="checkbox" asp-for="IsEnrolled">
-                    <label class="form-check-label" asp-for="IsEnrolled">
-
-                    </label>
-                    <span asp-validation-for="IsEnrolled" class="text-danger"></span>
-                </div>
-        </div>
     </div>
-    <div class="row">
+
+    <div>
+        <div class="row">
+
+            <div class="col-4">
+                <div class="image-uploaded">
+                    @if (!string.IsNullOrEmpty(Model?.transcriptPhotoUrl))
+                    {
+                        <img src="/@Model?.transcriptPhotoUrl" id="StudentPhoto" class="img-thumbnail align-center" style="height:200px;width:180px;" />
+                    }
+                    else
+                    {
+                        <img id="ErrorPhoto" src="~/images/errorphoto.jpg" class="img-thumbnail align-center " style="height:200px;width:180px;">
+                    }
+
+                </div>
+
+                <div class="input-group input-file mt-1">
+                    <label class="input-group-btn ">
+                        <span class="btn btn-large btn-primary">
+                            Upload Photo
+                            <input asp-for="transcriptPhoto" class="form-control" onchange="readURL(this, '@Model?.transcriptPhotoUrl')" style="display: none;" />
+                            <span asp-validation-for="transcriptPhoto" class="text-danger"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="col-4">
+
+                <div class="image-uploaded">
+                    @if (!string.IsNullOrEmpty(Model?.citizenshipPhotoUrl))
+                    {
+                        <img src="/@Model?.citizenshipPhotoUrl" id="StudentPhoto" class="img-thumbnail align-center" style="height:200px;width:180px;" />
+                    }
+                    else
+                    {
+                        <img id="ErrorPhoto" src="~/images/errorphoto.jpg" class="img-thumbnail align-center " style="height:200px;width:180px;">
+                    }
+
+                </div>
+
+                <div class="input-group input-file mt-1">
+                    <label class="input-group-btn ">
+                        <span class="btn btn-large btn-primary">
+                            Upload Photo
+                            <input asp-for="citizenshipPhoto" class="form-control" onchange="readURL(this, '@Model?.citizenshipPhotoUrl')" style="display: none;" />
+                            <span asp-validation-for="citizenshipPhoto" class="text-danger"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
         <div class="col-4">
-            <div class="form-floating">
-                <select asp-for="DegreeId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(new SelectList(ViewBag.DegreeList,"Id","DegreeName"))">
-                    <option disabled selected value="null">--CHOOSE</option>
-                </select>
-                <label asp-for="DegreeId"></label>
-                <span asp-validation-for="DegreeId" class="text-danger"></span>
+            <div class="form-group">
+                <input class="form-check-input" type="checkbox" asp-for="IsEnrolled">
+                <label class="form-check-label" asp-for="IsEnrolled">
+
+                </label>
+                <span asp-validation-for="IsEnrolled" class="text-danger"></span>
             </div>
         </div>
     </div>
+    
 
     @if (User.IsInRole("ADMIN"))
     {
@@ -121,4 +192,26 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function readURL(input, url) {
+            if (input.files && input.files[0]) {
+
+                var reader = new FileReader();
+
+                if (url == '') {
+                    reader.onload = function (e) {
+                        $('#ErrorPhoto').attr('src', e.target.result);
+                    }
+                }
+                else
+                {
+                    reader.onload = function (e) {
+                        $('#StudentPhoto').attr('src', e.target.result);
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+    </script>
 }
