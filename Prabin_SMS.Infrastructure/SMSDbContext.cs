@@ -20,12 +20,9 @@ namespace Prabin_SMS.Infrastructure
             builder.ApplyConfiguration(new CourseConfiguration());
             builder.ApplyConfiguration(new StudentConfiguration());
             builder.ApplyConfiguration(new DegreeConfiguration());
-            builder.ApplyConfiguration(new TeacherConfiguration());
-            builder.ApplyConfiguration(new StudentCourseConfiguration());
             builder.ApplyConfiguration(new DegreeCourseConfiguration());
-            builder.ApplyConfiguration(new TeacherCourseConfiguration());
-            builder.ApplyConfiguration(new TeacherDegreeConfiguration());
-            builder.ApplyConfiguration(new TeacherStudentConfiguration());
+            builder.ApplyConfiguration(new DisciplineConfiguration());
+
         }
     }
 }

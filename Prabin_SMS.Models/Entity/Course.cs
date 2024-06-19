@@ -17,12 +17,8 @@ namespace Prabin_SMS.Models.Entity
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
-        public IEnumerable<Student> Students{  get; set; }
-        public IEnumerable<Degree> Degrees { get; set; }
-        public IEnumerable<Teacher> Teachers { get; set; }
-        public IEnumerable<StudentCourse> StudentCourses { get; set; }
-        public IEnumerable<DegreeCourse> DegreeCourses { get; set; }
-        public IEnumerable<TeacherCourse> TeacherCourses { get; set; }
+        public virtual IEnumerable<Degree> Degrees { get; set; }
+        public virtual IEnumerable<DegreeCourse> DegreeCourses { get; set; }
 
     }
 }

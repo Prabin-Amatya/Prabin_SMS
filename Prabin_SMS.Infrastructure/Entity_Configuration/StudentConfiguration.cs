@@ -36,16 +36,11 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                 .IsRequired();
 
             builder.Property(p => p.SectionId)
-                .HasMaxLength(100)
                 .IsRequired(false);
 
             builder.Property(p => p.Semester)
-                .HasMaxLength(100)
                 .IsRequired(false);
 
-            builder.Property(p => p.studenturl)
-                .HasMaxLength(100)
-                .IsRequired(false);
 
             builder.Property(p => p.CreatedDate)
                .IsRequired()
@@ -64,7 +59,6 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
               .IsRequired(false);
             builder.Property(p => p.citizenshipPhotoUrl)
               .IsRequired(false);
-
 
             builder.HasOne(e => e.Degree)
                  .WithMany(e => e.Students)

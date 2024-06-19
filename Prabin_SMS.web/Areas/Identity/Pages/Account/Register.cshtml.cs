@@ -107,19 +107,8 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "Field is Empty")]
             public string FirstName { get; set; }
-            public string MiddleName { get; set; }
-
-            [Required(ErrorMessage = "Field is Empty")]
             public string LastName { get; set; }
-            public string PhoneNumber { get; set; }
-
-            public string Address { get; set; }
-            //public string PhoneNumber { get; set; }
-            public string UserRoleId { get; set; }
-            public string CourseId { get; set; }
-            public string profileUrl { get; set; }
             public bool IsActive { get; set; }
-            public string profilePicture { get; set; }
             public DateTime CreatedDate { get; set; }
             public int CreatedBy { get; set; }
         }
@@ -144,14 +133,9 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
                 user.IsActive = true;
                 user.FirstName = Input.FirstName;
                 user.LastName = Input.LastName;
-                user.Address = Input.Address;
-                user.ProfileUrl = Input.profileUrl;
                 user.CreatedBy = Ad_user.Id;
                 user.CreatedDate = DateTime.Now;
-              
-
-                var role =_roleManager.FindByNameAsync(user.UserRoleId).Result;
-                user.UserRoleId = role.Id;
+                user.HasEnrolled = false;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -159,11 +143,7 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    if(role!=null)
-                    {
-                        IdentityResult roleresult =await _userManager.AddToRoleAsync(user, role.Name);
-                    }
-                    
+                     IdentityResult roleresult =await _userManager.AddToRoleAsync(user, "USER");
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);

@@ -40,7 +40,7 @@ namespace Prabin_SMS.web.Models
         public string UserRoleId { get; set; }
         public string? profileUrl { get; set; }
         [NotMapped]
-        public IFormFile? profileData { get; set; }
+        public IFormFile? profilePicture { get; set; }
 
         public string? Code { get; set; }
         public string? Id { get; set; }

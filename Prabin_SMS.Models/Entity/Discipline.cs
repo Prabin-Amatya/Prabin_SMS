@@ -10,7 +10,7 @@ namespace Prabin_SMS.Models.Entity
     {
         public string Name {  get; set; }
         public bool IsActive {  get; set; }
-        public IEnumerable<Degree> Degrees { get; set; }
+        public virtual IEnumerable<Degree> Degrees { get; set; }
         public DateTime CreatedDate { get; set; }
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }

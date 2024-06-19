@@ -89,6 +89,32 @@
         </div>
     </div>
     <div class="row">
+        <div class="col-4">
+            <div class="image-uploaded">
+                @if (!string.IsNullOrEmpty(Model?.profileUrl))
+                {
+                    <img src="/@Model?.profileUrl" id="UserPhoto" class="img-thumbnail align-center" style="height:200px;width:180px;" />
+                }
+                else
+                {
+                    <img id="NoPhoto" src="~/images/NoUserPhoto.webp" class="img-thumbnail align-center " style="height:200px;width:180px;">
+                }
+
+            </div>
+            <div class="row">
+                <div class="input-group input-file mt-1">
+                    <label class="input-group-btn ">
+                        <span class="btn btn-large btn-primary">
+                            Upload Photo
+                            <input asp-for="profilePicture" class="form-control" onchange="readURL(this, '@Model?.profileUrl')" style="display: none;" />
+                            <span asp-validation-for="profilePicture" class="text-danger"></span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-6">
             <button asp-action="Index" type="submit" class="w-100 btn btn-lg btn-primary">Back</button>
         </div>
@@ -103,4 +129,24 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function readURL(input, url) {
+            if (input.files && input.files[0]) {
+
+                var reader = new FileReader();
+
+                if (url == '') {
+                    reader.onload = function (e) {
+                        $('#UserPhoto').attr('src', e.target.result);
+                    }
+                }
+                else {
+                    reader.onload = function (e) {
+                        $('#NoPhoto').attr('src', e.target.result);
+                    }
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
 }

@@ -38,12 +38,6 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
                .IsRequired()
                .HasDefaultValueSql("GETDATE()")
                .HasColumnType("DATETIME");
-            builder.HasMany(e => e.Students)
-                .WithMany(e => e.Courses)
-                .UsingEntity<StudentCourse>(
-                l => l.HasOne(e => e.Student).WithMany(e => e.StudentCourses).HasForeignKey(e => e.StudentId).OnDelete(DeleteBehavior.Restrict),
-                r => r.HasOne(e => e.Course).WithMany(e => e.StudentCourses).HasForeignKey(e => e.CourseId).OnDelete(DeleteBehavior.Restrict)
-                );
 
 
         }

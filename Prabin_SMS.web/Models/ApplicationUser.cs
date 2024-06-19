@@ -11,6 +11,7 @@ namespace Prabin_SMS.web.Models
         public string Address { get; set; }
         public string PhoneNumber { get; set; }
         public bool IsActive { get; set; }
+        public bool HasEnrolled { get; set; }
         public string? ProfileUrl { get; set; }
         [NotMapped]
         public IFormFile ProfilePicture { get; set; }

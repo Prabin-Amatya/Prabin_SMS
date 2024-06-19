@@ -11,7 +11,7 @@ namespace Prabin_SMS.web.Data
         {
             var _userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             var _roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            string[] roles = {"SUPERADMIN", "ADMIN", "STUDENT", "TEACHER"};
+            string[] roles = {"SUPERADMIN", "ADMIN", "STUDENT", "USER"};
             foreach(string role in roles)
             {
                 if(!await _roleManager.RoleExistsAsync(role))

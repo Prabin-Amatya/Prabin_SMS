@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Prabin_SMS.Infrastructure;
 
@@ -11,9 +12,11 @@ using Prabin_SMS.Infrastructure;
 namespace Prabin_SMS.Infrastructure.Migrations
 {
     [DbContext(typeof(SMSDbContext))]
-    partial class SMSDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240618192450_newtable")]
+    partial class newtable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

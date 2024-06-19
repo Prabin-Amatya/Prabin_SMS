@@ -17,18 +17,16 @@ namespace Prabin_SMS.web.Controllers
     {
         private readonly ICRUDServices<Course> _course;
         private readonly ICRUDServices<Student> _student;
-        private readonly ICRUDServices<Teacher> _teacher;
         private readonly ICRUDServices<Degree> _degree;
         private readonly ICRUDServices<Discipline> _discipline;
         private readonly UserManager<ApplicationUser> _user;
         private readonly ICRUDServices<DegreeCourse> _DegreeCourse;
 
-        public DegreeController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<StudentCourse> studentCourse, ICRUDServices<Teacher> teacher, ICRUDServices<Degree> degree, ICRUDServices<Discipline> discipline, ICRUDServices<DegreeCourse> degreeCourse)
+        public DegreeController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user,  ICRUDServices<Degree> degree, ICRUDServices<Discipline> discipline, ICRUDServices<DegreeCourse> degreeCourse)
         {
             _course = course;
             _student = student;
             _user = user;
-            _teacher = teacher;
             _degree = degree;
             _discipline = discipline;
             _DegreeCourse = degreeCourse;
@@ -57,33 +55,37 @@ namespace Prabin_SMS.web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddEdit(Degree degree)
         {
-            ViewBag.Discipline = await _discipline.GetAllAsync();
-            var UserId = _user.GetUserId(HttpContext.User);
-            if (degree.Id == 0)
+            if (ModelState.IsValid)
             {
-                degree.CreatedBy = UserId;
-                degree.CreatedDate = DateTime.Now;
-                await _degree.InsertAsync(degree);
+                ViewBag.Discipline = await _discipline.GetAllAsync();
+                var UserId = _user.GetUserId(HttpContext.User);
+                if (degree.Id == 0)
+                {
+                    degree.CreatedBy = UserId;
+                    degree.CreatedDate = DateTime.Now;
+                    await _degree.InsertAsync(degree);
+                }
+                else if (degree.Id != 0)
+                {
+                    Degree updated_degree = await _degree.GetAsync(degree.Id);
+                    updated_degree.IsActive = degree.IsActive;
+                    updated_degree.StartDate = degree.StartDate;
+                    updated_degree.DegreeName = degree.DegreeName;
+                    updated_degree.DegreeDescription = degree.DegreeDescription;
+                    updated_degree.DisciplineId = degree.DisciplineId;
+                    updated_degree.Academic_Level = degree.Academic_Level;
+                    updated_degree.No_Of_Semesters = degree.No_Of_Semesters;
+                    updated_degree.No_Of_Years = degree.No_Of_Years;
+                    updated_degree.TotalSeats = degree.TotalSeats;
+                    updated_degree.RemainingSeats = degree.RemainingSeats;
+                    updated_degree.ModifiedDate = DateTime.Now;
+                    updated_degree.ModifiedBy = UserId;
+                    await _degree.UpdateAsync(updated_degree);
+                }
+                return RedirectToAction(nameof(Index));
             }
-            else if (degree.Id != 0)
-            {
-                Degree updated_degree = await _degree.GetAsync(degree.Id);
-                updated_degree.IsActive = degree.IsActive;
-                updated_degree.StartDate = degree.StartDate;
-                updated_degree.DegreeName = degree.DegreeName;
-                updated_degree.DegreeDescription = degree.DegreeDescription;
-                updated_degree.DisciplineId = degree.DisciplineId;
-                updated_degree.Academic_Level = degree.Academic_Level;
-                updated_degree.No_Of_Semesters = degree.No_Of_Semesters;
-                updated_degree.No_Of_Years = degree.No_Of_Years;
-                updated_degree.TotalSeats = degree.TotalSeats;
-                updated_degree.RemainingSeats = degree.RemainingSeats;
-                updated_degree.ModifiedDate = DateTime.Now;
-                updated_degree.ModifiedBy = UserId;
-                await _degree.UpdateAsync(updated_degree);
-            }
-
-            return RedirectToAction(nameof(Index));
+            
+            return RedirectToAction(nameof(AddEdit));
 
         }
 
@@ -166,6 +168,82 @@ namespace Prabin_SMS.web.Controllers
             return Json(new { Count });
         }
 
+        [HttpPost]
+        [Route("api/Degree/PostStudent")]
+        public async Task<IActionResult> PostStudent(Student studentData)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var UserId = _user.GetUserId(HttpContext.User);
+                    var user = await _user.FindByIdAsync(UserId);
+
+                    if (studentData.studentPhoto != null)
+                    {
+                        string fileDirectory = $"wwwroot/StudentImage";
+
+                        if (!Directory.Exists(fileDirectory))
+                        {
+                            Directory.CreateDirectory(fileDirectory);
+                        }
+                        string uniqueFileName = Guid.NewGuid() + "_" + studentData.studentPhoto.FileName;
+                        string filePath = Path.Combine(Path.GetFullPath($"wwwroot/StudentImage"), uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await studentData.studentPhoto.CopyToAsync(fileStream);
+                            studentData.studenturl = $"StudentImage/" + uniqueFileName;
+                        }
+
+                    }
+
+                    if (studentData.transcriptPhoto != null)
+                    {
+                        string fileDirectory = $"wwwroot/TranscriptImage";
+
+                        if (!Directory.Exists(fileDirectory))
+                        {
+                            Directory.CreateDirectory(fileDirectory);
+                        }
+                        string uniqueFileName = Guid.NewGuid() + "_" + studentData.transcriptPhoto.FileName;
+                        string filePath = Path.Combine(Path.GetFullPath($"wwwroot/TranscriptImage"), uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await studentData.transcriptPhoto.CopyToAsync(fileStream);
+                            studentData.transcriptPhotoUrl = $"TranscriptImage/" + uniqueFileName;
+                        }
+                    }
+
+                    if (studentData.citizenshipPhoto != null)
+                    {
+                        string fileDirectory = $"wwwroot/citizenshipPhotoImage";
+
+                        if (!Directory.Exists(fileDirectory))
+                        {
+                            Directory.CreateDirectory(fileDirectory);
+                        }
+                        string uniqueFileName = Guid.NewGuid() + "_" + studentData.citizenshipPhoto.FileName;
+                        string filePath = Path.Combine(Path.GetFullPath($"wwwroot/citizenshipPhotoImage"), uniqueFileName);
+
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await studentData.citizenshipPhoto.CopyToAsync(fileStream);
+                            studentData.citizenshipPhotoUrl = $"citizenshipPhotoImage/" + uniqueFileName;
+                        }
+
+                    }
+                    studentData.CreatedBy = UserId;
+                    studentData.CreatedDate = DateTime.Now;
+                    user.HasEnrolled = true;
+                    var result = await _student.InsertAsync(studentData);
+                }
+                catch(Exception ex) { }
+            }
+                
+                return Json(1);
+        }
 
     }
 }

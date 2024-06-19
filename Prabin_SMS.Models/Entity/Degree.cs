@@ -23,12 +23,10 @@ namespace Prabin_SMS.Models.Entity
         public string CreatedBy { get; set; }
         public DateTime? ModifiedDate { get; set; }
         public string? ModifiedBy { get; set; }
-        public Discipline Discipline { get; set; }
+        public virtual Discipline Discipline { get; set; }
         public int DisciplineId { get; set; }
-        public IEnumerable<Student> Students { get; set; }
-        public IEnumerable<Course> Courses { get; set; }
-        public IEnumerable<Teacher> Teachers { get; set; }
-        public IEnumerable<DegreeCourse> DegreeCourses { get; set; }
-        public IEnumerable<TeacherDegree> TeacherDegrees { get; set; }
+        public virtual IEnumerable<Student> Students { get; set; }
+        public virtual IEnumerable<Course> Courses { get; set; }
+        public virtual IEnumerable<DegreeCourse> DegreeCourses { get; set; }
     }
 }

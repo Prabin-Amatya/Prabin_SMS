@@ -1,6 +1,10 @@
 ﻿@model IEnumerable<Prabin_SMS.Models.Entity.Degree>
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> userManager
+@{
+    var user = await userManager.GetUserAsync(User);
+}
 
 <h2>User Management</h2>
 <div class="row">
@@ -92,10 +96,17 @@
                                 <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Edit</a>
                             </td>
                         }
-                        @if(!SignInManager.IsSignedIn(User))
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("USER"))
                         {
                             <td>
-                                <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Enroll</a>
+                                <button class="Enroll btn btn-primary float-end" value="@items.Id">Enroll</button>
+                                <input class="Name" value="@items.DegreeName" hidden/>
+                            </td>
+                        }
+                        @if (!SignInManager.IsSignedIn(User) && user.HasEnrolled==false)
+                        {
+                            <td>
+                                <a class="btn btn-primary float-end" asp-area="Identity" asp-page="/Account/Register">Enroll</a>
                             </td>
                         }
                     </tr>
@@ -105,3 +116,317 @@
     </div>
 </div>
 
+
+<div id="StudentModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="row">
+                    <div class="col-4">
+                        <h5 class="modal-title">Add Student </h5>
+                    </div>
+                    <div class="col-2">
+                        <h5 class="modal-title" style="padding-top:75%">To </h5>
+                    </div>
+                    <div class="col-6">
+                        <div class="form-floating">
+                            <select class="form-control" disabled>
+                                <option disabled selected id="DegreeId" value="null">CHOOSE</option>
+                            </select>
+                            <label>Degree</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="btn-close" onclick="$('#StudentModal').hide();" aria-label="Close"></button>
+            </div>
+
+                
+            <div class="modal-body">
+                <form>
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="form-floating">
+                                <input id="FirstName" class="form-control" autocomplete="username" aria-required="true" />
+                                <label>First Name</label>
+                                <span class="text-danger"></span>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Email" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Email</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Batch" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Batch</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            @* <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <select id="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
+                                            <option disabled selected value="0">CHOOSE</option>
+                                        </select>
+                                        <label>Section Id</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div> *@
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating">
+                                <input id="LastName" class="form-control" autocomplete="username" aria-required="true" />
+                                <label>Last Name</label>
+                                <span class="text-danger"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Address" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Address</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="PhoneNumber" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>PhoneNumber</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            @* <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Semester" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Semester</label>
+                                        <span class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div> *@
+                        </div>
+
+                        <div class="col-4">
+                            <label>Photo</label>
+                            <div class="image-uploaded">
+                                <img src="~/images/NoPhoto.png" id="NoStuPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
+                            </div>
+
+                            <div class="row">
+                                <div class="input-group input-file mt-1">
+
+                                    <label class="input-group-btn">
+                                        <span class="btn btn-large btn-primary">
+                                            Upload Photo
+                                            <input id="studentPhoto" type="file" accept="image/*" class="form-control file-upload" onchange="readURL(this,'NoStuPhoto' )" style="display: none;" />
+                                            <span class="text-danger"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div>
+                        <div class="row">
+
+                            <div class="col-4">
+                                <label>Transcript Photo</label>
+                                <div class="image-uploaded">
+
+                                    <img src="~/images/NoPhoto.png" id="NoTransPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
+
+
+                                </div>
+
+                                <div class="input-group input-file mt-1">
+                                    <label class="input-group-btn ">
+                                        <span class="btn btn-large btn-primary">
+                                            Upload Photo
+                                            <input id="transcriptPhoto" class="form-control file-upload" type="file" accept="image/*" onchange="readURL(this, 'NoTransPhoto')" style="display: none;" />
+                                            <span class="text-danger"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="col-4">
+                                <label>Citizenship Photo</label>
+                                <div class="image-uploaded">
+
+                                    <img src="~/images/NoPhoto.png" id="NoCitizenPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
+
+                                </div>
+
+                                <div class="input-group input-file mt-1">
+                                    <label class="input-group-btn ">
+                                        <span class="btn btn-large btn-primary">
+                                            Upload Photo
+                                            <input id="citizenshipPhoto" class="form-control file-upload" type="file" accept="image/*" onchange="readURL(this , 'NoCitizenPhoto')" style="display: none;" />
+                                            <span class="text-danger"></span>
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="col-6">
+                    <button class="w-100 btn btn-lg btn-primary float-end" id="submit">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function readURL(input, noImgID) {
+            debugger;
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                var $noImgElement = $('#' + noImgID);
+                
+                    reader.onload = function (e) {
+                        $noImgElement.attr('src', e.target.result);
+                    }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        $(".Enroll").on('click',function () {
+            debugger;
+            var Id = $(this).val();
+            var Name = $(this).siblings('.Name').val();
+            $("#DegreeId").val(Id);
+            $("#DegreeId").text(Name);
+            $("#StudentModal").show();
+        });
+
+        $(document).ready(function(){
+            $("#StudentModal").on('shown', function(){
+                    
+            })
+        })
+
+        $("#submit").click(function () {
+            debugger;
+            var DegreeId = $("#DegreeId").val();
+            var FirstName = $("#FirstName").val();
+            var LastName = $("#LastName").val();
+            var Email = $("#Email").val();
+            var Address = $("#Address").val();
+            var PhoneNumber = $("#PhoneNumber").val();
+            var Batch = $("#Batch").val();
+            var SectionId = 0;
+            var Semester = 0;
+            var studentUrl = null;
+            var transcriptPhotoUrl = null;
+            var citizenPhotoUrl = null;
+            var IsEnrolled = false;
+
+
+            var stuPhoto = $("#studentPhoto")[0].files;
+            var transPhoto = $("#transcriptPhoto")[0].files;
+            var citizenPhoto = $("#citizenshipPhoto")[0].files;
+
+            var studentData = new FormData();
+
+            studentData.append("DegreeId", DegreeId);
+            studentData.append("FirstName", FirstName);
+            studentData.append("LastName", LastName);
+            studentData.append("Email", Email);
+            studentData.append("Address", Address);
+            studentData.append("PhoneNumber", PhoneNumber);
+            studentData.append("Batch", Batch);
+            studentData.append("SectionId", SectionId);
+            studentData.append("Semester", Semester);
+             studentData.append("studentUrl", studentUrl);
+             studentData.append("transcriptPhotoUrl", transcriptPhotoUrl);
+             studentData.append("citizenPhotoUrl", citizenPhotoUrl);
+             studentData.append("IsEnrolled", IsEnrolled);
+
+            for (var i = 0; i < stuPhoto.length; i++) {
+                studentData.append("studentPhoto",  stuPhoto[i]);
+            }
+
+            for (var i = 0; i < transPhoto.length; i++) {
+                studentData.append("transcriptPhoto", transPhoto[i]);
+            }
+
+            for (var i = 0; i < transPhoto.length; i++) {
+                studentData.append("citizenshipPhoto", citizenPhoto[i]);
+            }
+
+            $.ajax(
+                {
+                    url: "/api/Degree/PostStudent",
+                    data: studentData ,
+                    method: "post",
+                    processData: false,
+                    contentType: false,
+                }
+            ).done(function (data) {
+
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                console.error("AJAX error: " + textStatus + ' : ' + errorThrown);
+                console.error("Response: ", jqXHR.responseText);
+            });
+            
+        });
+
+
+        function validForm() {
+
+            var currValues = [$("#CategoryInfoId").val(),
+            $("#ProductInfoId").val(),
+            $("#Price").val(),
+            $("#BatchNo").val(),
+            $("#UnitInfoId").val(),
+            $("#Amount").val(),
+            $("#Quantity").val(),
+            ];
+
+            var val = '#Valid';
+            var values = ['Category', 'Product', 'Price', 'Batch', 'Unit', 'Amount', 'Quantity'];
+            var id = '';
+            var isValid = true;
+            debugger;
+            for (let i = 0; i < values.length; i++) {
+                id = val + values[i];
+                if (!currValues[i]) {
+                    $(id).text(values[i] + ' field is empty');
+                    isValid = false;
+                }
+                else if (!(currValues[i] instanceof String)) {
+                    if (isNaN(currValues[i]) || currValues[i] < 0) {
+                        $(id).text(values[i] + ' field is invalid');
+                    }
+                }
+                else $(id).text('');
+            }
+            return isValid;
+        }
+
+
+    </script>
+}
