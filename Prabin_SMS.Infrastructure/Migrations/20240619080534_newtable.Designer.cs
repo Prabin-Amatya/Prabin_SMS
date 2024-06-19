@@ -12,7 +12,7 @@ using Prabin_SMS.Infrastructure;
 namespace Prabin_SMS.Infrastructure.Migrations
 {
     [DbContext(typeof(SMSDbContext))]
-    [Migration("20240618192450_newtable")]
+    [Migration("20240619080534_newtable")]
     partial class newtable
     {
         /// <inheritdoc />
@@ -34,7 +34,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CourseDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CourseName")
@@ -43,7 +42,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -83,11 +81,9 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Academic_Level")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -96,7 +92,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DegreeDescription")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DegreeName")
@@ -176,7 +171,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("CreatedBy")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedDate")
@@ -197,7 +191,6 @@ namespace Prabin_SMS.Infrastructure.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -214,11 +207,12 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Batch")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("Batch")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("DATETIME")
+                        .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("CreatedBy")
                         .HasColumnType("nvarchar(max)");
@@ -264,11 +258,9 @@ namespace Prabin_SMS.Infrastructure.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<int?>("SectionId")
-                        .HasMaxLength(100)
                         .HasColumnType("int");
 
                     b.Property<int?>("Semester")
-                        .HasMaxLength(100)
                         .HasColumnType("int");
 
                     b.Property<string>("citizenshipPhotoUrl")

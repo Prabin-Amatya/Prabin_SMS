@@ -75,9 +75,7 @@ namespace Prabin_SMS.web.Controllers
             {
                 var Ad_userId = _user.GetUserId(HttpContext.User);
                 var Ad_user = await _user.FindByIdAsync(Ad_userId);
-                if (ModelState.IsValid)
-                {
-                    if (registerViewModel.profileUrl != null)
+                    if (registerViewModel.profilePicture != null)
                     {
                         string fileDirectory = $"wwwroot/ProfileImage";
 
@@ -97,7 +95,8 @@ namespace Prabin_SMS.web.Controllers
                     }
 
                     var user = CreateUser();
-                    user.IsActive = true;
+                    user.IsActive = false;
+                    user.HasEnrolled = true;
                     user.FirstName = registerViewModel.FirstName;
                     user.LastName = registerViewModel.LastName;
                     user.Address = registerViewModel.Address;
@@ -132,8 +131,8 @@ namespace Prabin_SMS.web.Controllers
                             values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                             protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(registerViewModel.Email, "Confirm your email",
-                            $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        await _emailSender.SendEmailAsync(registerViewModel.Email," Confirm your email",
+                            $"Your Email:" + registerViewModel.Email + "   Your Password:" + registerViewModel.Password + "Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
 
                     }
@@ -141,7 +140,7 @@ namespace Prabin_SMS.web.Controllers
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
-                }
+                
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(AddUser));
@@ -180,7 +179,7 @@ namespace Prabin_SMS.web.Controllers
             user.Address = registerViewModel.Address;
             user.PhoneNumber = registerViewModel.PhoneNumber;
             user.ProfileUrl = registerViewModel.profileUrl;
-
+            user.HasEnrolled = true;
             await _user.UpdateAsync(user);
             return RedirectToAction(nameof(Index));
         }
@@ -219,6 +218,8 @@ namespace Prabin_SMS.web.Controllers
 
         }
 
+        
+
         private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
             if (!_user.SupportsUserEmail)
@@ -241,5 +242,7 @@ namespace Prabin_SMS.web.Controllers
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
+
+        
     }
 }

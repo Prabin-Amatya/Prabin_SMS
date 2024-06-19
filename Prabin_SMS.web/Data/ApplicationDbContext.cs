@@ -40,7 +40,7 @@ namespace Prabin_SMS.web.Data
                .HasMaxLength(100);
 
             builder.Entity<ApplicationUser>()
-               .Property(p => p.IsActive)
+               .Property(p => p.HasEnrolled)
                .IsRequired()
                .HasMaxLength(100);
 

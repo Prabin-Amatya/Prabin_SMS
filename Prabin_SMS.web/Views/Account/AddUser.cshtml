@@ -12,7 +12,7 @@
 
 
 
-<form id="registerForm" action="AddUser" method="post">
+<form id="registerForm" action="AddUser" method="post" enctype="multipart/form-data">
     <div class="row">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="col-6">
@@ -91,14 +91,8 @@
     <div class="row">
         <div class="col-4">
             <div class="image-uploaded">
-                @if (!string.IsNullOrEmpty(Model?.profileUrl))
-                {
-                    <img src="/@Model?.profileUrl" id="UserPhoto" class="img-thumbnail align-center" style="height:200px;width:180px;" />
-                }
-                else
-                {
                     <img id="NoPhoto" src="~/images/NoUserPhoto.webp" class="img-thumbnail align-center " style="height:200px;width:180px;">
-                }
+
 
             </div>
             <div class="row">
@@ -135,16 +129,11 @@
 
                 var reader = new FileReader();
 
-                if (url == '') {
-                    reader.onload = function (e) {
-                        $('#UserPhoto').attr('src', e.target.result);
-                    }
+                reader.onload = function (e) {
+                    $('#NoPhoto').attr('src', e.target.result);
                 }
-                else {
-                    reader.onload = function (e) {
-                        $('#NoPhoto').attr('src', e.target.result);
-                    }
-                }
+                
+                
                 reader.readAsDataURL(input.files[0]);
             }
         }

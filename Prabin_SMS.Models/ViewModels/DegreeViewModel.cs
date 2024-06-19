@@ -10,7 +10,7 @@ namespace Prabin_SMS.Models.ViewModels
 {
     public class DegreeViewModel
     {
-        public IEnumerable<DegreeCourse> DegreeCourse {  get; set; }
-        public Degree Degree {  get; set; }
+        public DegreeSearchViewModel degreeSearchViewModel {  get; set; }
+        public IEnumerable<Degree> Degree {  get; set; }
     }
 }

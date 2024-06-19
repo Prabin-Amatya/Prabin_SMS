@@ -41,6 +41,9 @@ namespace Prabin_SMS.Infrastructure.Entity_Configuration
             builder.Property(p => p.Semester)
                 .IsRequired(false);
 
+            builder.Property(p => p.Batch)
+               .HasColumnType("DATETIME")
+               .IsRequired(false);
 
             builder.Property(p => p.CreatedDate)
                .IsRequired()

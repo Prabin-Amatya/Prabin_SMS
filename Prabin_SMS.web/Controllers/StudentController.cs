@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Prabin_SMS.Infrastructure.IRepository;
 using Prabin_SMS.Models.Entity;
+using Prabin_SMS.Models.ViewModels;
 using Prabin_SMS.web.Models;
 
 namespace Prabin_SMS.web.Controllers
@@ -26,11 +27,13 @@ namespace Prabin_SMS.web.Controllers
 
         public async Task<IActionResult> Index()
         {
+            StudentViewModel studentViewModel = new StudentViewModel();
             ViewBag.DegreeList = await _degree.GetAllAsync();
             
-            var student = await _student.GetAllAsync();
-            return View(student);
+            studentViewModel.Students = await _student.GetAllAsync();
+            return View(studentViewModel);
         }
+
         [Authorize(Roles = "ADMIN")]
 
         public async Task<IActionResult> AddEdit(int id)
@@ -52,6 +55,7 @@ namespace Prabin_SMS.web.Controllers
             {
                 ViewBag.DegreeList = await _degree.GetAllAsync();
                 var UserId = _user.GetUserId(HttpContext.User);
+                var user =await _user.FindByIdAsync(UserId);
 
                 if (student.studentPhoto != null)
                 {
@@ -131,11 +135,35 @@ namespace Prabin_SMS.web.Controllers
                     updated_student.ModifiedBy = UserId;
                     updated_student.DegreeId = student.DegreeId;
                     await _student.UpdateAsync(updated_student);
+                    user.HasEnrolled = true;
+                    await _user.UpdateAsync(user);
                 }
 
                 return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(AddEdit));
+
+        
+        }
+
+        public async Task<IActionResult> EnrollmentStatus(int Id)
+        {
+            var student = await _student.GetAsync(Id);
+            if (student.IsEnrolled == true)
+            {
+                student.IsEnrolled = false;
+            }
+            else
+            {
+                student.IsEnrolled = true;
+                var degree = await _degree.GetAsync(student.DegreeId);
+                if (student.Semester==0)
+                {
+                    student.Semester = 1;
+                }
+            }
+            await _student.UpdateAsync(student);
+            return RedirectToAction(nameof(Index));
 
         }
 

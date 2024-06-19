@@ -1,0 +1,16 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Prabin_SMS.Models.ViewModels
+{
+    public class StudentSearchViewModel
+    {
+        public string Query {  get; set; }
+        public DateTime? Batch { get; set; }
+        public int? Semester { get; set; }
+        public int? SectionId { get; set; }
+    }
+}

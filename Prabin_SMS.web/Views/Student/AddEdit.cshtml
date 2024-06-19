@@ -19,8 +19,8 @@
     
         <div class="col-4">
             <div class="form-floating">
-                <select asp-for="DegreeId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(new SelectList(ViewBag.DegreeList,"Id","DegreeName"))">
-                    <option disabled selected value="null">--CHOOSE--</option>
+                <select asp-for="DegreeId" id="DegreeId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(new SelectList(ViewBag.DegreeList,"Id","DegreeName"))">
+                    <option selected disabled value="null">--CHOOSE--</option>
                 </select>
                 <label>Degree</label>
                 <span asp-validation-for="DegreeId" class="text-danger"></span>
@@ -49,16 +49,15 @@
 
             <div class="row">
                 <div class="col-12">
-                    <div class="form-floating">
-                        <input asp-for="Batch" class="form-control" autocomplete="username" aria-required="true" />
-                        <label asp-for="Batch"></label>
-                        <span asp-validation-for="Batch" class="text-danger"></span>
-                    </div>
+                    <label asp-for="Batch"></label>
+                    <input asp-for="Batch" type="datetime-local" class="form-control" />
+                     <span asp-validation-for="Batch" class="text-danger"></span>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-12">
+            @if (Model.Id != 0)
+            {
+                <div class="row">
+                    <div class="col-12">
                     <div class="form-floating">
                         <select asp-for="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
                             <option disabled selected value="null">--CHOOSE</option>
@@ -68,6 +67,7 @@
                     </div>
                 </div>
             </div>
+            }
         </div>
 
         <div class="col-4">
@@ -96,15 +96,17 @@
                     </div>
                 </div>
             </div>
-            <div>
-                <div class="col-12">
-                    <div class="form-floating">
-                        <input asp-for="Semester" class="form-control" autocomplete="username" aria-required="true" />
-                        <label asp-for="Semester"></label>
-                        <span asp-validation-for="Semester" class="text-danger"></span>
+
+            @if (Model.Id != 0)
+            {
+                <div class="row">
+                    <div class="col-12">
+                        <label  class="form-label">Semester:</label>
+                        <output id="output"></output>
+                        <input type="range" asp-for="Semester" class="form-range" id="customRange" oninput="this.nextElementSibling.value = this.value" min="1">
                     </div>
                 </div>
-            </div>
+            }
         </div>
 
         <div class="col-4">
@@ -133,16 +135,7 @@
             </div>
         </div>
         
-    </div>       
-        
-            
-        
-            
-    
-       
-
-    
-
+    </div>     
     
 
     <div>
@@ -248,7 +241,38 @@
                 }
                 reader.readAsDataURL(input.files[0]);
             }
+
+            
         }
 
+        $(document).ready(function(){
+            debugger;
+            var DegreeId = $("#DegreeId").val();
+            $.ajax({
+                url: "/api/Degree/getSemesterNo",
+                data: { DegreeId: DegreeId },
+                method: "get"
+            }).done(function (data) {
+                $("#customRange").attr("max", data["number"]);
+            })
+        })
+
+
+        $("#DegreeId").change(function () {
+            debugger;
+            var DegreeId = $("#DegreeId").val();
+            $.ajax({
+                url: "/api/Degree/getSemesterNo",
+                data: { DegreeId: DegreeId },
+                method: "get"
+            }).done(function (data) {
+                $("#customRange").attr("max", data["number"]);
+            })
+        });
+
+        $("#customRange").on('input',function () {
+            var num = $(this).val();
+            $('#output').text(num);
+        });
     </script>
 }

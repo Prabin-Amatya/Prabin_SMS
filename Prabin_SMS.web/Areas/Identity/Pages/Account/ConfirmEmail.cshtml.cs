@@ -35,10 +35,11 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
         {
             if (userId == null || code == null)
             {
-                return RedirectToPage("/Index");
+                return RedirectToPage("/Register");
             }
 
             var user = await _userManager.FindByIdAsync(userId);
+            user.IsActive = true;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{userId}'.");

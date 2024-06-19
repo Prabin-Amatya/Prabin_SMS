@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Prabin_SMS.Models.Entity.Degree>
+﻿@model Prabin_SMS.Models.ViewModels.DegreeViewModel
 @using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> userManager
@@ -6,19 +6,68 @@
     var user = await userManager.GetUserAsync(User);
 }
 
-<h2>User Management</h2>
 <div class="row">
-    <div class="col-12">
-        <a class="btn btn-primary float-end" asp-action="AddEdit">Add</a>
+    <div class="col-1"><h2>Degree</h2></div>
+    <div class="col-1 ms-3"><a class="btn btn-primary float-end" asp-action="AddEdit">Add</a></div>
+</div>
+
+<form asp-action="Search" method="GET">
+
+    <div class="input-group">
+        <input type="text" class="form-control"  id="degreeSearchViewModel.Query" placeholder="Degree"  aria-describedby="basic-addon2">
+        <div class="input-group-append">
+            <input class="btn btn-outline-secondary" type="submit" value="Search"/>
+        </div>
     </div>
-</div>
 
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+        <div class="container-fluid" style="padding-left:0px">
+            <div class="navbar-collapse justify-content-between align-items-start" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item" style="font-size:10px; padding-right: 0px">
+                            <textarea id="Search" class="form-control form-control-sm" placeholder="search" rows="1"></textarea>
+                            <div class="form-group">
+                            <select id="CourseList" class="form-control form-control-sm">
+                                    <option selected>Courses</option>
+                                </select>
+                                <span class="text-danger"></span>
+                            </div>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <select asp-for="degreeSearchViewModel.Level" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                            <option selected disabled value="null">Level</option>
+                            <option value="null">All</option>
+                            <option value="MASTERS">MASTERS</option>
+                            <option value="BACHELORS">BACHELORS</option>
+                        </select>
+                    </li>
 
+                    <li class="nav-item">
+                        <select asp-for="degreeSearchViewModel.DisciplineId" class="form-select form-select-sm" aria-label=".form-select-sm example" asp-items="@(new SelectList(ViewBag.Discipline,"Id","Name"))">
+                            <option selected disabled value="null">Discipline</option>
+                            <option value="null">All</option>
+                        </select>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-auto">
+                                <label for="inputPassword6" class="col-form-label">Start Date</label>
+                            </div>
+                            <div class="col-auto">
+                                <input asp-for="degreeSearchViewModel.StartDate" type="date" class="form-control form-control-sm" />
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<h3 class="align-content-center">Degrees</h3>
-<div class="form-outline" data-mdb-input-init>
-    <input type="search" id="form1" class="form-control" placeholder="Type query" aria-label="Search" />
-</div>
+</form>
+
 
 <div class="row">
     <div class="col-12">
@@ -37,8 +86,9 @@
                     <th>
                         Start Date
                     </th>
+                    
                     <th>
-                        Available Seats
+                        Total Seats
                     </th>
                     @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
                     {
@@ -51,12 +101,8 @@
                 </tr>
             </thead>
             <tbody>
-                @{
-                    int occupied = Model.Count();
-
-                }
                 
-                @foreach (var items in Model)
+                @foreach (var items in Model.Degree)
                 {
                    
                     <tr>
@@ -73,9 +119,19 @@
                             @items.StartDate.ToShortDateString()
                             
                         </td>
-                        <td>
-                            @items.RemainingSeats/@items.TotalSeats 
-                        </td>
+                        @if(items.TotalSeats != 0)
+                            {
+                                <td>
+                                     @items.TotalSeats 
+                                </td>
+                            }
+                        else
+                            {
+                                <td>
+                                Not Set
+                                </td>
+                            }
+                            
                         
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
                         {
@@ -89,26 +145,32 @@
                                     @:Deactive
                                 }
                             </td>
-                        }
-                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
-                        {
+                        
                             <td>
                                 <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Edit</a>
                             </td>
                         }
+
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("USER"))
                         {
-                            <td>
-                                <button class="Enroll btn btn-primary float-end" value="@items.Id">Enroll</button>
-                                <input class="Name" value="@items.DegreeName" hidden/>
-                            </td>
+                            if (user.HasEnrolled == false)
+                            {
+                                <td>
+                                    <button class="Enroll btn btn-primary float-end" value="@items.Id">Enroll</button>
+                                    <span id="EnrollSpan" class="text-danger"></span>
+                                    <input class="Name" value="@items.DegreeName" hidden />
+                                </td>
+                            }
                         }
-                        @if (!SignInManager.IsSignedIn(User) && user.HasEnrolled==false)
+                        @if (!SignInManager.IsSignedIn(User))
                         {
+
                             <td>
                                 <a class="btn btn-primary float-end" asp-area="Identity" asp-page="/Account/Register">Enroll</a>
                             </td>
+
                         }
+                        
                     </tr>
                 }
             </tbody>
@@ -149,52 +211,14 @@
                             <div class="form-floating">
                                 <input id="FirstName" class="form-control" autocomplete="username" aria-required="true" />
                                 <label>First Name</label>
-                                <span class="text-danger"></span>
+                                <span class="text-danger" id="ValidFirstName"></span>
                             </div>
                             <div class="row">
                                 <div class="col-12">
                                     <div class="form-floating">
                                         <input id="Email" class="form-control" autocomplete="username" aria-required="true" />
                                         <label>Email</label>
-                                        <span class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Batch" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Batch</label>
-                                        <span class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            @* <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <select id="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
-                                            <option disabled selected value="0">CHOOSE</option>
-                                        </select>
-                                        <label>Section Id</label>
-                                        <span class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div> *@
-                        </div>
-
-                        <div class="col-4">
-                            <div class="form-floating">
-                                <input id="LastName" class="form-control" autocomplete="username" aria-required="true" />
-                                <label>Last Name</label>
-                                <span class="text-danger"></span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Address" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Address</label>
-                                        <span class="text-danger"></span>
+                                        <span class="text-danger" id="ValidEmail"></span>
                                     </div>
                                 </div>
                             </div>
@@ -203,7 +227,45 @@
                                     <div class="form-floating">
                                         <input id="PhoneNumber" class="form-control" autocomplete="username" aria-required="true" />
                                         <label>PhoneNumber</label>
-                                        <span class="text-danger"></span>
+                                        <span class="text-danger" id="ValidPhoneNumber"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            @* <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Batch" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Batch</label>
+                                        <span class="text-danger" id="ValidBatch"></span>
+                                    </div>
+                                </div>
+                            </div> *@
+                                @* <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <select id="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
+                                                <option disabled selected value="0">CHOOSE</option>
+                                            </select>
+                                            <label>Section Id</label>
+                                            <span class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div> *@
+                        </div>
+
+                        <div class="col-4">
+                            <div class="form-floating">
+                                <input id="LastName" class="form-control" autocomplete="username" aria-required="true" />
+                                <label>Last Name</label>
+                                <span class="text-danger" id="ValidLastName"></span>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-floating">
+                                        <input id="Address" class="form-control" autocomplete="username" aria-required="true" />
+                                        <label>Address</label>
+                                        <span class="text-danger" id="ValidAddress"></span>
                                     </div>
                                 </div>
                             </div>
@@ -297,7 +359,6 @@
 
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
     <script>
         function readURL(input, noImgID) {
             debugger;
@@ -315,11 +376,18 @@
 
         $(".Enroll").on('click',function () {
             debugger;
-            var Id = $(this).val();
-            var Name = $(this).siblings('.Name').val();
-            $("#DegreeId").val(Id);
-            $("#DegreeId").text(Name);
-            $("#StudentModal").show();
+            
+            if ('@user?.IsActive'!='False') {
+                    var Id = $(this).val();
+                    var Name = $(this).siblings('.Name').val();
+                    $("#DegreeId").val(Id);
+                    $("#DegreeId").text(Name);
+                    $("#StudentModal").show();
+            }
+            else
+            {
+                $("#EnrollSpan").text("Inactive Account")
+            }
         });
 
         $(document).ready(function(){
@@ -330,84 +398,83 @@
 
         $("#submit").click(function () {
             debugger;
-            var DegreeId = $("#DegreeId").val();
-            var FirstName = $("#FirstName").val();
-            var LastName = $("#LastName").val();
-            var Email = $("#Email").val();
-            var Address = $("#Address").val();
-            var PhoneNumber = $("#PhoneNumber").val();
-            var Batch = $("#Batch").val();
-            var SectionId = 0;
-            var Semester = 0;
-            var studentUrl = null;
-            var transcriptPhotoUrl = null;
-            var citizenPhotoUrl = null;
-            var IsEnrolled = false;
+            if (validForm()) {
+                var DegreeId = $("#DegreeId").val();
+                var FirstName = $("#FirstName").val();
+                var LastName = $("#LastName").val();
+                var Email = $("#Email").val();
+                var Address = $("#Address").val();
+                var PhoneNumber = $("#PhoneNumber").val();
+                var SectionId = 0;
+                var Semester = 0;
+                var studentUrl = null;
+                var transcriptPhotoUrl = null;
+                var citizenPhotoUrl = null;
+                var IsEnrolled = false;
 
 
-            var stuPhoto = $("#studentPhoto")[0].files;
-            var transPhoto = $("#transcriptPhoto")[0].files;
-            var citizenPhoto = $("#citizenshipPhoto")[0].files;
+                var stuPhoto = $("#studentPhoto")[0].files;
+                var transPhoto = $("#transcriptPhoto")[0].files;
+                var citizenPhoto = $("#citizenshipPhoto")[0].files;
 
-            var studentData = new FormData();
+                var studentData = new FormData();
 
-            studentData.append("DegreeId", DegreeId);
-            studentData.append("FirstName", FirstName);
-            studentData.append("LastName", LastName);
-            studentData.append("Email", Email);
-            studentData.append("Address", Address);
-            studentData.append("PhoneNumber", PhoneNumber);
-            studentData.append("Batch", Batch);
-            studentData.append("SectionId", SectionId);
-            studentData.append("Semester", Semester);
-             studentData.append("studentUrl", studentUrl);
-             studentData.append("transcriptPhotoUrl", transcriptPhotoUrl);
-             studentData.append("citizenPhotoUrl", citizenPhotoUrl);
-             studentData.append("IsEnrolled", IsEnrolled);
+                studentData.append("DegreeId", DegreeId);
+                studentData.append("FirstName", FirstName);
+                studentData.append("LastName", LastName);
+                studentData.append("Email", Email);
+                studentData.append("Address", Address);
+                studentData.append("PhoneNumber", PhoneNumber);
+                studentData.append("SectionId", SectionId);
+                studentData.append("Semester", Semester);
+                studentData.append("studentUrl", studentUrl);
+                studentData.append("transcriptPhotoUrl", transcriptPhotoUrl);
+                studentData.append("citizenPhotoUrl", citizenPhotoUrl);
+                studentData.append("IsEnrolled", IsEnrolled);
 
-            for (var i = 0; i < stuPhoto.length; i++) {
-                studentData.append("studentPhoto",  stuPhoto[i]);
-            }
-
-            for (var i = 0; i < transPhoto.length; i++) {
-                studentData.append("transcriptPhoto", transPhoto[i]);
-            }
-
-            for (var i = 0; i < transPhoto.length; i++) {
-                studentData.append("citizenshipPhoto", citizenPhoto[i]);
-            }
-
-            $.ajax(
-                {
-                    url: "/api/Degree/PostStudent",
-                    data: studentData ,
-                    method: "post",
-                    processData: false,
-                    contentType: false,
+                for (var i = 0; i < stuPhoto.length; i++) {
+                    studentData.append("studentPhoto", stuPhoto[i]);
                 }
-            ).done(function (data) {
 
-            }).fail(function (jqXHR, textStatus, errorThrown) {
-                console.error("AJAX error: " + textStatus + ' : ' + errorThrown);
-                console.error("Response: ", jqXHR.responseText);
-            });
+                for (var i = 0; i < transPhoto.length; i++) {
+                    studentData.append("transcriptPhoto", transPhoto[i]);
+                }
+
+                for (var i = 0; i < transPhoto.length; i++) {
+                    studentData.append("citizenshipPhoto", citizenPhoto[i]);
+                }
+
+                $.ajax(
+                    {
+                        url: "/api/Degree/PostStudent",
+                        data: studentData,
+                        method: "post",
+                        processData: false,
+                        contentType: false,
+                    }
+                ).done(function (data) {
+                    location.reload();
+                }).fail(function (jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX error: " + textStatus + ' : ' + errorThrown);
+                    console.error("Response: ", jqXHR.responseText);
+                });
+                
+            }
             
         });
 
 
         function validForm() {
 
-            var currValues = [$("#CategoryInfoId").val(),
-            $("#ProductInfoId").val(),
-            $("#Price").val(),
-            $("#BatchNo").val(),
-            $("#UnitInfoId").val(),
-            $("#Amount").val(),
-            $("#Quantity").val(),
+            var currValues = [$("#FirstName").val(),
+            $("#Email").val(),
+            $("#LastName").val(),
+            $("#Address").val(),
+            $("#PhoneNumber").val()
             ];
 
             var val = '#Valid';
-            var values = ['Category', 'Product', 'Price', 'Batch', 'Unit', 'Amount', 'Quantity'];
+            var values = ['FirstName', 'Email', 'LastName', 'Address', 'PhoneNumber'];
             var id = '';
             var isValid = true;
             debugger;
@@ -417,16 +484,31 @@
                     $(id).text(values[i] + ' field is empty');
                     isValid = false;
                 }
-                else if (!(currValues[i] instanceof String)) {
-                    if (isNaN(currValues[i]) || currValues[i] < 0) {
-                        $(id).text(values[i] + ' field is invalid');
-                    }
-                }
                 else $(id).text('');
             }
             return isValid;
         }
 
+        $("#Search").keyup(function () {
+            debugger;
+            var query = $("#Search").val();
+            $("#CourseList").empty();
 
+            $.ajax({
+                url: '/api/Degree/getAllCourses',
+                data: { query: query },
+                method: 'GET'
+            }).done(function (data) {
+
+                var options = "";
+                $.each(data["courses"], function (index, value) {
+                    options += '<option  value="' + value["id"] + '">' + value["courseName"] + '</option>';
+                });
+                $("#CourseList").append(options);
+            }).fail(function () {
+            });
+        });
+
+        
     </script>
 }

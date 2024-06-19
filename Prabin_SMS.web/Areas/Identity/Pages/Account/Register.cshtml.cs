@@ -105,9 +105,6 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
-            [Required(ErrorMessage = "Field is Empty")]
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
             public bool IsActive { get; set; }
             public DateTime CreatedDate { get; set; }
             public int CreatedBy { get; set; }
@@ -122,18 +119,14 @@ namespace Prabin_SMS.web.Areas.Identity.Pages.Account
 
         public async Task<IActionResult> OnPostAsync(string returnUrl = null)
         {
-            var Ad_userId = _userManager.GetUserId(HttpContext.User);
-            var Ad_user =await _userManager.FindByIdAsync(Ad_userId);
 
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-                user.IsActive = true;
-                user.FirstName = Input.FirstName;
-                user.LastName = Input.LastName;
-                user.CreatedBy = Ad_user.Id;
+                user.IsActive = false;
+                user.CreatedBy = "this";
                 user.CreatedDate = DateTime.Now;
                 user.HasEnrolled = false;
 

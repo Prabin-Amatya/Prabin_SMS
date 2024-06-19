@@ -18,12 +18,12 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CourseName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CourseDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CourseDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreditHours = table.Column<int>(type: "int", nullable: false),
                     FullMarks = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -38,10 +38,10 @@ namespace Prabin_SMS.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -57,8 +57,8 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DegreeName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    DegreeDescription = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Academic_Level = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DegreeDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Academic_Level = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     No_Of_Semesters = table.Column<int>(type: "int", nullable: false),
                     No_Of_Years = table.Column<int>(type: "int", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -66,7 +66,7 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     RemainingSeats = table.Column<int>(type: "int", nullable: false),
                     StartDate = table.Column<DateTime>(type: "DATE", nullable: false),
                     CreatedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModifiedDate = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
                     ModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DisciplineId = table.Column<int>(type: "int", nullable: false)
@@ -119,11 +119,11 @@ namespace Prabin_SMS.Infrastructure.Migrations
                     FirstName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Batch = table.Column<int>(type: "int", nullable: false),
-                    Semester = table.Column<int>(type: "int", maxLength: 100, nullable: true),
-                    SectionId = table.Column<int>(type: "int", maxLength: 100, nullable: true),
+                    Batch = table.Column<DateTime>(type: "DATETIME", nullable: false, defaultValueSql: "GETDATE()"),
+                    Semester = table.Column<int>(type: "int", nullable: true),
+                    SectionId = table.Column<int>(type: "int", nullable: true),
                     IsEnrolled = table.Column<bool>(type: "bit", nullable: false),
                     studenturl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     transcriptPhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),

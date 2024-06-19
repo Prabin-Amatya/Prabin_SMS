@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -12,11 +13,12 @@ namespace Prabin_SMS.Models.Entity
         public string DegreeName { get; set; }
         public string DegreeDescription {  get; set; }
         public string Academic_Level { get; set; }
+        [Display(Name = "Number Of Semesters:")]
         public int No_Of_Semesters {  get; set; }
+        [Display(Name = "Number Of Years:")]
         public int No_Of_Years { get; set; }
         public bool IsActive { get; set; }
         public int TotalSeats {  get; set; }
-        public int RemainingSeats { get; set; }
         [Column(TypeName="DATE")]
         public DateTime StartDate { get; set; }
         public DateTime CreatedDate { get; set; }

@@ -254,6 +254,10 @@ namespace Prabin_SMS.web.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<bool>("HasEnrolled")
+                        .HasMaxLength(100)
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsActive")
                         .HasMaxLength(100)
                         .HasColumnType("bit");
@@ -273,7 +277,6 @@ namespace Prabin_SMS.web.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("ProfileUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("UserRoleId")
