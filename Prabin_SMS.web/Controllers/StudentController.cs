@@ -1,11 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration.UserSecrets;
+using Microsoft.IdentityModel.Tokens;
 using Prabin_SMS.Infrastructure.IRepository;
+using Prabin_SMS.Infrastructure.Repository;
 using Prabin_SMS.Models.Entity;
 using Prabin_SMS.Models.ViewModels;
 using Prabin_SMS.web.Models;
+using System.Buffers;
+using System.Text.RegularExpressions;
 
 namespace Prabin_SMS.web.Controllers
 {
@@ -15,26 +20,47 @@ namespace Prabin_SMS.web.Controllers
         private readonly ICRUDServices<Course> _course;
         private readonly ICRUDServices<Student> _student;
         private readonly ICRUDServices<Degree> _degree;
+        private readonly IRawSqlRepository rawSqlRepository;
         private readonly UserManager<ApplicationUser> _user;
 
-        public StudentController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<Degree> degree)
+        public StudentController(ICRUDServices<Course> course, ICRUDServices<Student> student, UserManager<ApplicationUser> user, ICRUDServices<Degree> degree, IRawSqlRepository rawSqlRepository)
         {
             _course = course;
             _student = student;
             _user = user;
             _degree = degree;
+            this.rawSqlRepository = rawSqlRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(StudentViewModel studentViewModel)
         {
-            StudentViewModel studentViewModel = new StudentViewModel();
             ViewBag.DegreeList = await _degree.GetAllAsync();
+            if (studentViewModel.Students.IsNullOrEmpty())
+            {
+                studentViewModel.Students = await _student.GetAllAsync();
+            }
             
-            studentViewModel.Students = await _student.GetAllAsync();
             return View(studentViewModel);
         }
 
-        [Authorize(Roles = "ADMIN")]
+        public async Task<IActionResult> Search(StudentViewModel studentViewModel)
+        {
+            ViewBag.DegreeList = await _degree.GetAllAsync();
+
+            var result = rawSqlRepository.FromSql<Student>("usp_getStudents @Sectionid, @Semester, @DegreeId, @batch, @query",
+              new SqlParameter("@Sectionid", studentViewModel.studentSearchViewModel.SectionId == 0 ? (object)DBNull.Value : studentViewModel.studentSearchViewModel.SectionId),
+              new SqlParameter("@Semester", studentViewModel.studentSearchViewModel.Semester == 0 ? (object)DBNull.Value : studentViewModel.studentSearchViewModel.Semester),
+              new SqlParameter("@DegreeId", studentViewModel.studentSearchViewModel.DegreeId == null ? (object)DBNull.Value : studentViewModel.studentSearchViewModel.DegreeId),
+              new SqlParameter("@batch", studentViewModel.studentSearchViewModel.Batch == null ? (object)DBNull.Value : studentViewModel.studentSearchViewModel.Batch),
+              new SqlParameter("@query", studentViewModel.studentSearchViewModel.Query == null ? (object)DBNull.Value : studentViewModel.studentSearchViewModel.Query)
+              ).ToList();
+
+            studentViewModel.Students = result;
+            return View(nameof(Index), studentViewModel);
+
+        }
+
+        [Authorize(Roles = "ADMIN, STUDENT")]
 
         public async Task<IActionResult> AddEdit(int id)
         {

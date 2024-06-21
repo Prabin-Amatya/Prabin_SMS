@@ -8,6 +8,7 @@ using Prabin_SMS.web.Models;
 
 namespace Prabin_SMS.web.Controllers
 {
+    [Authorize]
     public class CourseController : Controller
     {
         private readonly ICRUDServices<Course> _course;
@@ -25,8 +26,17 @@ namespace Prabin_SMS.web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var course =await _course.GetAllAsync();
-            return View(course);
+            if (User.IsInRole("ADMIN"))
+            {
+               var course = await _course.GetAllAsync();
+                return View(course);
+            }
+            else
+            {
+                var course = await _course.GetAllAsync(p=>p.IsActive);
+                return View(course);
+            }
+            
         }
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddEdit(int id)

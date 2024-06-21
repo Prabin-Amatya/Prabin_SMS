@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Prabin_SMS.web.Models
@@ -13,6 +14,8 @@ namespace Prabin_SMS.web.Models
         public bool IsActive { get; set; }
         public bool HasEnrolled { get; set; }
         public string? ProfileUrl { get; set; }
+        [Required]
+        public int StudentId {  get; set; }
         [NotMapped]
         public IFormFile ProfilePicture { get; set; }
         public DateTime CreatedDate { get; set; }

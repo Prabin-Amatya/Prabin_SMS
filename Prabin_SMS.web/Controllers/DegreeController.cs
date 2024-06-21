@@ -11,11 +11,14 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Prabin_SMS.web.Controllers
 {
     public class DegreeController : Controller
     {
+
         private readonly ICRUDServices<Course> _course;
         private readonly ICRUDServices<Student> _student;
         private readonly ICRUDServices<Degree> _degree;
@@ -35,18 +38,26 @@ namespace Prabin_SMS.web.Controllers
             this.rawSqlRepository = rawSqlRepository;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(DegreeViewModel degreeViewModel)
         {
-            DegreeViewModel degreeSearchViewModel = new DegreeViewModel();
             ViewBag.Discipline = await _discipline.GetAllAsync();
             ViewBag.Course = await _course.GetAllAsync();
-            degreeSearchViewModel.Degree = await _degree.GetAllAsync();
-            return View(degreeSearchViewModel);
+            if (degreeViewModel.Degree.IsNullOrEmpty())
+            {
+                if (User.IsInRole("ADMIN"))
+                {
+                    degreeViewModel.Degree = await _degree.GetAllAsync();
+                }
+                else
+                {
+                    degreeViewModel.Degree = await _degree.GetAllAsync(p => p.IsActive);
+                }
+            }
+            return View(degreeViewModel);
         }
 
         public async Task<IActionResult> Search(DegreeViewModel degreeViewModel)
         {
-            DegreeViewModel degreeSearchViewModel = new DegreeViewModel();
             ViewBag.Discipline = await _discipline.GetAllAsync();
             ViewBag.Course = await _course.GetAllAsync();
 
@@ -60,11 +71,11 @@ namespace Prabin_SMS.web.Controllers
 
             degreeViewModel.Degree = result;
 
-            return RedirectToAction(nameof(Index), degreeViewModel);
-           
+            return View(nameof(Index), degreeViewModel);
+
         }
 
-        [Authorize(Roles = "ADMIN")]
+        [Authorize]
         public async Task<IActionResult> AddEdit(int id)
         {
             ViewBag.Discipline = await _discipline.GetAllAsync();
@@ -108,7 +119,7 @@ namespace Prabin_SMS.web.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            
+
             return RedirectToAction(nameof(AddEdit));
 
         }
@@ -129,7 +140,7 @@ namespace Prabin_SMS.web.Controllers
                     .ToList();
                 courseSearchViewModel.Courses = filteredCourses;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
 
             }
@@ -139,26 +150,27 @@ namespace Prabin_SMS.web.Controllers
         [HttpPost]
         [Route("api/Degree/getSemesterCourses")]
         public async Task<IActionResult> getSemesterCourses(CourseSearchViewModel courseSearchViewModel)
-        {try
+        {
+            try
             {
                 var courseList = new List<CourseResultViewModel>();
                 if (courseSearchViewModel.DegreeId != 0)
                 {
                     var courseIds = await _DegreeCourse.GetAllAsync(p => p.DegreeId == courseSearchViewModel.DegreeId && p.Semester == courseSearchViewModel.Semester);
-                
+
                     foreach (var courseId in courseIds)
                     {
-                            CourseResultViewModel courseResultViewModel = new CourseResultViewModel();
-                            var course = await _course.GetAsync(p => p.Id == courseId.CourseId);
-                            courseResultViewModel.Id = course.Id;
-                            courseResultViewModel.CourseName = course.CourseName;
-                            courseList.Add(courseResultViewModel);
+                        CourseResultViewModel courseResultViewModel = new CourseResultViewModel();
+                        var course = await _course.GetAsync(p => p.Id == courseId.CourseId);
+                        courseResultViewModel.Id = course.Id;
+                        courseResultViewModel.CourseName = course.CourseName;
+                        courseList.Add(courseResultViewModel);
                     }
                 }
                 return Json(new { courseList });
 
             }
-            catch(Exception ex) { return Json(new { courseSearchViewModel.Courses }); }
+            catch (Exception ex) { return Json(new { courseSearchViewModel.Courses }); }
         }
 
         [HttpPost]
@@ -169,26 +181,26 @@ namespace Prabin_SMS.web.Controllers
             degreeCourse.CourseId = courseSearchViewModel.CourseId;
             degreeCourse.DegreeId = courseSearchViewModel.DegreeId;
             degreeCourse.Semester = courseSearchViewModel.Semester;
-            var result =await _DegreeCourse.InsertAsync(degreeCourse);
-            return Json(new{ result});
+            var result = await _DegreeCourse.InsertAsync(degreeCourse);
+            return Json(new { result });
         }
 
         [HttpPost]
         [Route("api/Degree/DeleteCourse")]
         public async Task<IActionResult> DeleteCourse(CourseSearchViewModel courseSearchViewModel)
         {
-            var degreeCourse= await _DegreeCourse.GetAsync(p => p.DegreeId == courseSearchViewModel.DegreeId && p.Semester == courseSearchViewModel.Semester && p.CourseId == courseSearchViewModel.CourseId);
+            var degreeCourse = await _DegreeCourse.GetAsync(p => p.DegreeId == courseSearchViewModel.DegreeId && p.Semester == courseSearchViewModel.Semester && p.CourseId == courseSearchViewModel.CourseId);
 
-            var result =  _DegreeCourse.Delete(degreeCourse);
+            var result = _DegreeCourse.Delete(degreeCourse);
             return Json(new { result });
         }
 
         [HttpGet]
         [Route("api/Degree/getRemainingSeats")]
         public async Task<IActionResult> getRemainingSeats(int totalCount, int degreeId)
-        { 
-            var occupiedSeats = await _student.GetAllAsync(p=>p.DegreeId == degreeId);
-            var Count = occupiedSeats.Count() ;
+        {
+            var occupiedSeats = await _student.GetAllAsync(p => p.DegreeId == degreeId);
+            var Count = occupiedSeats.Count();
             return Json(new { Count });
         }
 
@@ -267,10 +279,10 @@ namespace Prabin_SMS.web.Controllers
                     await _user.UpdateAsync(user);
                     var result = await _student.InsertAsync(studentData);
                 }
-                catch(Exception ex) { }
+                catch (Exception ex) { }
             }
-                
-                return Json(1);
+
+            return Json(1);
         }
 
         [HttpGet]
@@ -282,6 +294,20 @@ namespace Prabin_SMS.web.Controllers
             return Json(new { number });
         }
 
+        [HttpGet]
+        [Route("api/Degree/getDegrees")]
+        public async Task<IActionResult> getDegrees(string query)
+        {
+            query = Regex.Escape(query);
 
+            var degrees = await _degree.GetAllAsync();
+
+            // In-memory filtering using Regex
+            var degreeList = degrees
+                .Where(p => Regex.IsMatch(p.DegreeName, "^" + Regex.Escape(query) + ".*$", RegexOptions.IgnoreCase))
+                .ToList();
+
+            return Json(new { degreeList });
+        }
     }
 }

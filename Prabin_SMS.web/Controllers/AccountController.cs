@@ -61,6 +61,7 @@ namespace Prabin_SMS.web.Controllers
 
         public async Task<IActionResult> AddUser()
         {
+            ViewBag.Student = await _student.GetAllAsync(p=>p.IsEnrolled);
             var Ad_userId = _user.GetUserId(HttpContext.User);
             var Ad_user = await _user.FindByIdAsync(Ad_userId);
             RegisterViewModel registerViewModel = new RegisterViewModel();
@@ -71,81 +72,83 @@ namespace Prabin_SMS.web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddUser(RegisterViewModel registerViewModel)
         {
+            ViewBag.Student = await _student.GetAllAsync(p=>p.IsEnrolled);
             if (ModelState.IsValid)
             {
                 var Ad_userId = _user.GetUserId(HttpContext.User);
                 var Ad_user = await _user.FindByIdAsync(Ad_userId);
-                    if (registerViewModel.profilePicture != null)
+                if (registerViewModel.profilePicture != null)
+                {
+                    string fileDirectory = $"wwwroot/ProfileImage";
+
+                    if (!Directory.Exists(fileDirectory))
                     {
-                        string fileDirectory = $"wwwroot/ProfileImage";
+                        Directory.CreateDirectory(fileDirectory);
+                    }
+                    string uniqueFileName = Guid.NewGuid() + "_" + registerViewModel.profilePicture.FileName;
+                    string filePath = Path.Combine(Path.GetFullPath($"wwwroot/ProfileImage"), uniqueFileName);
 
-                        if (!Directory.Exists(fileDirectory))
-                        {
-                            Directory.CreateDirectory(fileDirectory);
-                        }
-                        string uniqueFileName = Guid.NewGuid() + "_" + registerViewModel.profilePicture.FileName;
-                        string filePath = Path.Combine(Path.GetFullPath($"wwwroot/ProfileImage"), uniqueFileName);
-
-                        using (var fileStream = new FileStream(filePath, FileMode.Create))
-                        {
-                            await registerViewModel.profilePicture.CopyToAsync(fileStream);
-                            registerViewModel.profileUrl = $"ProfileImage/" + uniqueFileName;
-                        }
-
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await registerViewModel.profilePicture.CopyToAsync(fileStream);
+                        registerViewModel.profileUrl = $"ProfileImage/" + uniqueFileName;
                     }
 
-                    var user = CreateUser();
-                    user.IsActive = false;
-                    user.HasEnrolled = true;
-                    user.FirstName = registerViewModel.FirstName;
-                    user.LastName = registerViewModel.LastName;
-                    user.Address = registerViewModel.Address;
-                    user.ProfileUrl = registerViewModel.profileUrl;
-                    user.CreatedBy = Ad_user.Id;
-                    user.CreatedDate = DateTime.Now;
+                }
 
-                    var returnUrl = Url.Content("~/");
-                    var role = _roleManager.FindByNameAsync(registerViewModel.UserRoleId).Result;
-                    user.UserRoleId = role.Id;
+                var user = CreateUser();
+                user.IsActive = true;
+                user.HasEnrolled = true;
+                user.FirstName = registerViewModel.FirstName;
+                user.LastName = registerViewModel.LastName;
+                user.Address = registerViewModel.Address;
+                user.ProfileUrl = registerViewModel.profileUrl;
+                user.StudentId = registerViewModel.StudentId;
+                user.CreatedBy = Ad_user.Id;
+                user.CreatedDate = DateTime.Now;
 
-                    await _userStore.SetUserNameAsync(user, registerViewModel.Email, CancellationToken.None);
-                    await _emailStore.SetEmailAsync(user, registerViewModel.Email, CancellationToken.None);
-                    await _user.SetPhoneNumberAsync(user, registerViewModel.PhoneNumber);
-                    var result = await _user.CreateAsync(user, registerViewModel.Password);
+                var returnUrl = Url.Content("~/");
+                var role = _roleManager.FindByNameAsync(registerViewModel.UserRoleId).Result;
+                user.UserRoleId = role.Id;
 
-                    if (result.Succeeded)
+                await _userStore.SetUserNameAsync(user, registerViewModel.Email, CancellationToken.None);
+                await _emailStore.SetEmailAsync(user, registerViewModel.Email, CancellationToken.None);
+                await _user.SetPhoneNumberAsync(user, registerViewModel.PhoneNumber);
+                var result = await _user.CreateAsync(user, registerViewModel.Password);
+
+                if (result.Succeeded)
+                {
+                    if (role != null)
                     {
-                        if (role != null)
-                        {
-                            IdentityResult roleresult = await _user.AddToRoleAsync(user, role.Name);
-                        }
+                        IdentityResult roleresult = await _user.AddToRoleAsync(user, role.Name);
+                    }
 
-                        _logger.LogInformation("User created a new account with password.");
+                    _logger.LogInformation("User created a new account with password.");
 
-                        var userId = await _user.GetUserIdAsync(user);
-                        var code = await _user.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                            protocol: Request.Scheme);
+                    var student = await _student.GetAsync(user.StudentId);
+                    var userId = await _user.GetUserIdAsync(user);
+                    var code = await _user.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        protocol: Request.Scheme);
 
-                        await _emailSender.SendEmailAsync(registerViewModel.Email," Confirm your email",
-                            $"Your Email:" + registerViewModel.Email + "   Your Password:" + registerViewModel.Password + "Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    if (user.StudentId != 0)
+                    {
 
-
+                        await _emailSender.SendEmailAsync(student.Email, " Confirm your email",
+                           $"Your Email:" + registerViewModel.Email + "   Your Password:" + registerViewModel.Password + $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                     }
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError(string.Empty, error.Description);
                     }
-                
-                return RedirectToAction(nameof(Index));
+                }
+                    return RedirectToAction(nameof(Index));
             }
             return RedirectToAction(nameof(AddUser));
-
-            
 
         }
 
@@ -181,24 +184,6 @@ namespace Prabin_SMS.web.Controllers
             user.ProfileUrl = registerViewModel.profileUrl;
             user.HasEnrolled = true;
             await _user.UpdateAsync(user);
-            return RedirectToAction(nameof(Index));
-        }
-
-        public async Task<IActionResult> ResetPassword(string Id)
-        {
-            RegisterViewModel registerViewModel = new RegisterViewModel();
-            registerViewModel.Id = Id;
-            var user =await _user.FindByIdAsync(Id);
-            var code =await _user.GeneratePasswordResetTokenAsync(user);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            registerViewModel.Code = code;
-            return View(registerViewModel);
-        }
-        [HttpPost]
-        public async Task<IActionResult> ResetPassword(RegisterViewModel registerViewModel)
-        {
-            var user = await _user.FindByIdAsync(registerViewModel.Id);
-            var reset = _user.ResetPasswordAsync(user, registerViewModel.Code, registerViewModel.Password);
             return RedirectToAction(nameof(Index));
         }
 

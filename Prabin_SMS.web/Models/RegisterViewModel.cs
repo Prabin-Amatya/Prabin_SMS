@@ -41,7 +41,7 @@ namespace Prabin_SMS.web.Models
         public string? profileUrl { get; set; }
         [NotMapped]
         public IFormFile? profilePicture { get; set; }
-
+        public int StudentId {  get; set; }
         public string? Code { get; set; }
         public string? Id { get; set; }
         public bool IsActive { get; set; }

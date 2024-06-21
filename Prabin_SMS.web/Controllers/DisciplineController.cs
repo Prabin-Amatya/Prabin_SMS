@@ -8,6 +8,7 @@ using Prabin_SMS.web.Models;
 
 namespace Prabin_SMS.web.Controllers
 {
+    [Authorize]
     public class DisciplineController : Controller
     {
         private readonly ICRUDServices<Course> _course;
@@ -30,6 +31,8 @@ namespace Prabin_SMS.web.Controllers
             var discipline =await _discipline.GetAllAsync();
             return View(discipline);
         }
+
+
         [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> AddEdit(int id)
         {

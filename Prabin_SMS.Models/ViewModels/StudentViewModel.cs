@@ -9,7 +9,7 @@ namespace Prabin_SMS.Models.ViewModels
 {
     public class StudentViewModel
     {
-        public StudentSearchViewModel SearchViewModel { get; set; }
+        public StudentSearchViewModel studentSearchViewModel { get; set; }
         public IEnumerable<Student> Students { get; set; }
     }
 }

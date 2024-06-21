@@ -6,36 +6,32 @@
     var user = await userManager.GetUserAsync(User);
 }
 
-<div class="row">
-    <div class="col-1"><h2>Degree</h2></div>
-    <div class="col-1 ms-3"><a class="btn btn-primary float-end" asp-action="AddEdit">Add</a></div>
-</div>
+<form asp-action="Search" method="get">
 
-<form asp-action="Search" method="GET">
-
-    <div class="input-group">
-        <input type="text" class="form-control"  id="degreeSearchViewModel.Query" placeholder="Degree"  aria-describedby="basic-addon2">
+    <div class="input-group" style="background:transparent">
+        <input type="text" class="form-control" asp-for="degreeSearchViewModel.Query" placeholder="Degree" aria-describedby="basic-addon2" style="background: transparent;">
         <div class="input-group-append">
             <input class="btn btn-outline-secondary" type="submit" value="Search"/>
         </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light mb-3" style="background: transparent !important; ">
         <div class="container-fluid" style="padding-left:0px">
             <div class="navbar-collapse justify-content-between align-items-start" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
                     <li class="nav-item" style="font-size:10px; padding-right: 0px">
-                            <textarea id="Search" class="form-control form-control-sm" placeholder="search" rows="1"></textarea>
-                            <div class="form-group">
-                            <select id="CourseList" class="form-control form-control-sm">
-                                    <option selected>Courses</option>
-                                </select>
-                                <span class="text-danger"></span>
-                            </div>
+                        <textarea id="Search" class="form-control form-control-sm" placeholder="search" rows="1" style="background: transparent; color: #605050"></textarea>
+                        <div class="form-group">
+                            <select asp-for="degreeSearchViewModel.CourseId" id="CourseList" class="form-control form-control-sm" style="background: transparent; color: #605050">
+                                <option selected>Courses</option>
+                            </select>
+                            <span class="text-danger"></span>
+                        </div>
                     </li>
-                    
+
                     <li class="nav-item">
-                        <select asp-for="degreeSearchViewModel.Level" class="form-select form-select-sm" aria-label=".form-select-sm example">
+                        <select asp-for="degreeSearchViewModel.Level" class="form-select form-select-sm" aria-label=".form-select-sm example" style="background: transparent; color: #605050">
                             <option selected disabled value="null">Level</option>
                             <option value="null">All</option>
                             <option value="MASTERS">MASTERS</option>
@@ -44,7 +40,7 @@
                     </li>
 
                     <li class="nav-item">
-                        <select asp-for="degreeSearchViewModel.DisciplineId" class="form-select form-select-sm" aria-label=".form-select-sm example" asp-items="@(new SelectList(ViewBag.Discipline,"Id","Name"))">
+                        <select asp-for="degreeSearchViewModel.DisciplineId" class="form-select form-select-sm" aria-label=".form-select-sm example" asp-items="@(new SelectList(ViewBag.Discipline,"Id","Name"))" style="background: transparent;color: #605050">
                             <option selected disabled value="null">Discipline</option>
                             <option value="null">All</option>
                         </select>
@@ -54,10 +50,10 @@
                     <li class="nav-item">
                         <div class="row g-3 align-items-center">
                             <div class="col-auto">
-                                <label for="inputPassword6" class="col-form-label">Start Date</label>
+                                <label for="inputPassword6" class="col-form-label" style="background: transparent;color: #605050">Start Date</label>
                             </div>
                             <div class="col-auto">
-                                <input asp-for="degreeSearchViewModel.StartDate" type="date" class="form-control form-control-sm" />
+                                <input asp-for="degreeSearchViewModel.StartDate" type="date" class="form-control form-control-sm" style="background: transparent; color: #605050" />
                             </div>
                         </div>
                     </li>
@@ -68,12 +64,29 @@
 
 </form>
 
+@if (Model.Degree != null)
+{
+    <div class="row d-flex justify-content-center mt-5" style="font-family: cursive;
+                                                                color: #767272;
+                                                                background: transparent;">
+        <div class="col-1"><h2>Degree</h2></div>
+        <div class="col-1 ms-3">
+            @if (User.IsInRole("ADMIN")){
+                    <a class="btn btn-secondary float-end" asp-action="AddEdit" style="background: transparent; color: #000000ad;">Add</a>
+            }
+         </div>
+    </div>
+}
+
 
 <div class="row">
     <div class="col-12">
-        <table class="table table-bordered">
-            <thead>
+        <table class="table mt-3" style="font-family: cursive;color: #000000ad; border-width:0px; border-collapse:separate; border-spacing:40px">
+            <thead style="font-size:15.2px; text-align:center">
                 <tr>
+                    <th>
+                        S.N
+                    </th>
                     <th>
                         Degree Name
                     </th>
@@ -90,22 +103,21 @@
                     <th>
                         Total Seats
                     </th>
-                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
-                    {
-                    <th>
-                        Active
-                    </th>
-                    <th></th>
-                    }
+                    
 
                 </tr>
             </thead>
             <tbody>
-                
-                @foreach (var items in Model.Degree)
+                @{
+                    int count = 1;
+                }
+                @foreach (var items in Model?.Degree)
                 {
                    
                     <tr>
+                        <td>
+                            @count
+                        </td>
                         <td>
                             @items.DegreeName
                         </td>
@@ -133,31 +145,42 @@
                             }
                             
                         
-                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("ADMIN"))
+                        @if (SignInManager.IsSignedIn(User))
                         {
+
                             <td>
-                                @if (items.IsActive == true)
-                                {
-                                    @:Active
-                                }
-                                else
-                                {
-                                    @:Deactive
-                                }
-                            </td>
-                        
-                            <td>
-                                <a class="btn btn-primary float-end" asp-action="AddEdit" asp-route-id="@items.Id">Edit</a>
+                                <a class="btn btn-secondary buttontable" asp-action="AddEdit" asp-route-id="@items.Id">
+                                    @if (User.IsInRole("ADMIN"))
+                                    {
+                                        @:Edit
+                                    }
+                                    else
+                                    {
+                                        @:Details
+                                    }
+                                </a>
                             </td>
                         }
+                        else
+                        {
+                            <td>
+                                <a class="btn btn-secondary buttontable" asp-action="AddEdit" asp-route-id="@items.Id">
+                                    Details
+                                </a>
+                            </td>
+                        }
+
+
+
 
                         @if (SignInManager.IsSignedIn(User) && User.IsInRole("USER"))
                         {
                             if (user.HasEnrolled == false)
                             {
                                 <td>
-                                    <button class="Enroll btn btn-primary float-end" value="@items.Id">Enroll</button>
-                                    <span id="EnrollSpan" class="text-danger"></span>
+                                    
+                                    <button class="Enroll btn btn-secondary buttontable" value="@items.Id">Enroll</button>
+                                    <p id="EnrollSpan" class="text-danger"></p>
                                     <input class="Name" value="@items.DegreeName" hidden />
                                 </td>
                             }
@@ -166,12 +189,14 @@
                         {
 
                             <td>
-                                <a class="btn btn-primary float-end" asp-area="Identity" asp-page="/Account/Register">Enroll</a>
+                                <a class="btn btn-secondary buttontable" asp-area="Identity" asp-page="/Account/Register">Enroll</a>
                             </td>
 
                         }
-                        
                     </tr>
+                    
+                        count = count + 1;
+                    
                 }
             </tbody>
         </table>
@@ -182,161 +207,83 @@
 <div id="StudentModal" class="modal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header" style="background: repeating-linear-gradient(180deg, #d3d3d399, transparent 100px); border-bottom: 0px;">
                 <div class="row">
-                    <div class="col-4">
-                        <h5 class="modal-title">Add Student </h5>
-                    </div>
-                    <div class="col-2">
-                        <h5 class="modal-title" style="padding-top:75%">To </h5>
-                    </div>
-                    <div class="col-6">
-                        <div class="form-floating">
-                            <select class="form-control" disabled>
-                                <option disabled selected id="DegreeId" value="null">CHOOSE</option>
-                            </select>
-                            <label>Degree</label>
-                        </div>
+                    <div class="col-12">
+                            <div class="form-floating">
+                                <select class="form-control addEditInput" disabled>
+                                    <option disabled selected id="DegreeId" value="null">CHOOSE</option>
+                                </select>
+                                <label>JOIN</label>
+                            </div>
                     </div>
                 </div>
 
-                <button type="button" class="btn-close" onclick="$('#StudentModal').hide();" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="$('#StudentModal').hide();" aria-label="Close">X</button>
             </div>
 
                 
-            <div class="modal-body">
+            <div class="modal-body" style="background: repeating-linear-gradient(180deg, #d3d3d399, transparent 100px)">
                 <form>
                     <div class="row">
                         <div class="col-4">
-                            <div class="form-floating">
-                                <input id="FirstName" class="form-control" autocomplete="username" aria-required="true" />
-                                <label>First Name</label>
-                                <span class="text-danger" id="ValidFirstName"></span>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Email" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Email</label>
-                                        <span class="text-danger" id="ValidEmail"></span>
-                                    </div>
+                            <div class="col-12  d-flex flex-column align-items-center">
+                                <label>Photo</label>
+                                <div class="image-uploaded">
+                                    <img src="~/images/NoPhoto.png" id="NoStuPhoto" class="NoPhoto img-thumbnail align-center addEditModalImage" style="height:100px;width:100px;">
                                 </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="PhoneNumber" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>PhoneNumber</label>
-                                        <span class="text-danger" id="ValidPhoneNumber"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            @* <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Batch" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Batch</label>
-                                        <span class="text-danger" id="ValidBatch"></span>
-                                    </div>
-                                </div>
-                            </div> *@
-                                @* <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-floating">
-                                            <select id="SectionId" class="form-control" autocomplete="username" aria-required="true" asp-items="@(Html.GetEnumSelectList<Prabin_SMS.Models.Enum.SectionEnum>())">
-                                                <option disabled selected value="0">CHOOSE</option>
-                                            </select>
-                                            <label>Section Id</label>
-                                            <span class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                </div> *@
-                        </div>
 
+                                <div class="row">
+                                    <div class="input-group input-file mt-1 justify-content-center">
+
+                                        <label class="input-group-btn">
+                                            <span class="btn btn-outline-secondary" style="font-size:12px">
+                                                Upload
+                                                <input id="studentPhoto" type="file" accept="image/*" class="form-control file-upload" onchange="readURL(this,'NoStuPhoto' )" style="display: none;" />
+                                                <span class="text-danger"></span>
+                                            </span>
+                                        </label>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-4">
-                            <div class="form-floating">
-                                <input id="LastName" class="form-control" autocomplete="username" aria-required="true" />
-                                <label>Last Name</label>
-                                <span class="text-danger" id="ValidLastName"></span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Address" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Address</label>
-                                        <span class="text-danger" id="ValidAddress"></span>
-                                    </div>
-                                </div>
-                            </div>
-                            @* <div class="row">
-                                <div class="col-12">
-                                    <div class="form-floating">
-                                        <input id="Semester" class="form-control" autocomplete="username" aria-required="true" />
-                                        <label>Semester</label>
-                                        <span class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div> *@
-                        </div>
-
-                        <div class="col-4">
-                            <label>Photo</label>
-                            <div class="image-uploaded">
-                                <img src="~/images/NoPhoto.png" id="NoStuPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
-                            </div>
-
-                            <div class="row">
-                                <div class="input-group input-file mt-1">
-
-                                    <label class="input-group-btn">
-                                        <span class="btn btn-large btn-primary">
-                                            Upload Photo
-                                            <input id="studentPhoto" type="file" accept="image/*" class="form-control file-upload" onchange="readURL(this,'NoStuPhoto' )" style="display: none;" />
-                                            <span class="text-danger"></span>
-                                        </span>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <div>
-                        <div class="row">
-
-                            <div class="col-4">
+                            <div class="col-12 d-flex flex-column align-items-center">
                                 <label>Transcript Photo</label>
                                 <div class="image-uploaded">
 
-                                    <img src="~/images/NoPhoto.png" id="NoTransPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
+                                    <img src="~/images/NoPhoto.png" id="NoTransPhoto" class="NoPhoto img-thumbnail align-center addEditModalImage" style="height:100px;width:100px;">
 
 
                                 </div>
 
-                                <div class="input-group input-file mt-1">
+                                <div class="input-group input-file mt-1 justify-content-center">
                                     <label class="input-group-btn ">
-                                        <span class="btn btn-large btn-primary">
-                                            Upload Photo
+                                        <span class="btn btn-outline-secondary" style="font-size:12px">
+                                            Upload
                                             <input id="transcriptPhoto" class="form-control file-upload" type="file" accept="image/*" onchange="readURL(this, 'NoTransPhoto')" style="display: none;" />
                                             <span class="text-danger"></span>
                                         </span>
                                     </label>
                                 </div>
                             </div>
+                        </div>
 
-                            <div class="col-4">
+                        <div class="col-4">
+                            <div class="col-12 d-flex flex-column align-items-center">
                                 <label>Citizenship Photo</label>
                                 <div class="image-uploaded">
 
-                                    <img src="~/images/NoPhoto.png" id="NoCitizenPhoto" class="NoPhoto img-thumbnail align-center " style="height:200px;width:180px;">
+                                    <img src="~/images/NoPhoto.png" id="NoCitizenPhoto" class="NoPhoto img-thumbnail align-center addEditModalImage" style="height:100px;width:100px;">
 
                                 </div>
 
-                                <div class="input-group input-file mt-1">
+                                <div class="input-group input-file mt-1 justify-content-center">
                                     <label class="input-group-btn ">
-                                        <span class="btn btn-large btn-primary">
-                                            Upload Photo
+                                        <span class="btn btn-outline-secondary" style="font-size:12px">
+                                            Upload
                                             <input id="citizenshipPhoto" class="form-control file-upload" type="file" accept="image/*" onchange="readURL(this , 'NoCitizenPhoto')" style="display: none;" />
                                             <span class="text-danger"></span>
                                         </span>
@@ -344,14 +291,67 @@
                                 </div>
                             </div>
                         </div>
-                        
                     </div>
+
+                    <div class="row"> 
+                            <div class="col-6 mt-3">
+                                <div class="form-floating">
+                                    <input id="FirstName" class="form-control addEditInput" autocomplete="username" aria-required="true" />
+                                    <label>First Name</label>
+                                    <span class="text-danger" id="ValidFirstName"></span>
+                                </div>
+                            </div>
+                       
+
+                            <div class="col-6 mt-3">
+                                <div class="form-floating">
+                                    <input id="LastName" class="form-control addEditInput" autocomplete="username" aria-required="true" />
+                                    <label>Last Name</label>
+                                    <span class="text-danger" id="ValidLastName"></span>
+                                </div>
+                            </div>
+                    </div>
+
+
+
+                    <div class="row">
+
+                        <div class="col-4 mt-3">
+                            <div class="form-floating">
+                                <input id="Email" class="form-control addEditInput" autocomplete="username" aria-required="true" />
+                                <label>Email</label>
+                                <span class="text-danger" id="ValidEmail"></span>
+                            </div>
+                        </div>
+
+
+                        <div class="col-4 mt-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input id="PhoneNumber" class="form-control addEditInput" autocomplete="username" aria-required="true" />
+                                    <label>PhoneNumber</label>
+                                    <span class="text-danger" id="ValidPhoneNumber"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-4 mt-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input id="Address" class="form-control addEditInput" autocomplete="username" aria-required="true" />
+                                    <label>Address</label>
+                                    <span class="text-danger" id="ValidAddress"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mt-4" >
+                        <button class="btn btn-outline-secondary float-end" id="submit" style="border:0px">Submit</button>
+                    </div>
+                   
+                            
                 </form>
-            </div>
-            <div class="modal-footer">
-                <div class="col-6">
-                    <button class="w-100 btn btn-lg btn-primary float-end" id="submit">Submit</button>
-                </div>
             </div>
         </div>
     </div>
@@ -390,15 +390,13 @@
             }
         });
 
-        $(document).ready(function(){
-            $("#StudentModal").on('shown', function(){
-                    
-            })
-        })
+        
 
         $("#submit").click(function () {
-            debugger;
+           debugger;
+            var debug = validForm();
             if (validForm()) {
+                debugger;
                 var DegreeId = $("#DegreeId").val();
                 var FirstName = $("#FirstName").val();
                 var LastName = $("#LastName").val();
@@ -477,7 +475,6 @@
             var values = ['FirstName', 'Email', 'LastName', 'Address', 'PhoneNumber'];
             var id = '';
             var isValid = true;
-            debugger;
             for (let i = 0; i < values.length; i++) {
                 id = val + values[i];
                 if (!currValues[i]) {

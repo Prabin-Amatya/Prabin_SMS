@@ -10,7 +10,8 @@ namespace Prabin_SMS.Models.ViewModels
     {
         public string Query {  get; set; }
         public DateTime? Batch { get; set; }
-        public int? Semester { get; set; }
-        public int? SectionId { get; set; }
+        public int Semester { get; set; }
+        public int SectionId { get; set; }
+        public int? DegreeId { get; set; }
     }
 }

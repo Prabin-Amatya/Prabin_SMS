@@ -39,6 +39,8 @@ namespace IMS.Infrastructure.Services
             smtp.Send(message);
             return Task.CompletedTask;
         }
+
+        
     }
 
 }
