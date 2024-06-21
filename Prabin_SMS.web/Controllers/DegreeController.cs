@@ -13,6 +13,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using Microsoft.IdentityModel.Tokens;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Prabin_SMS.web.Controllers
 {
@@ -289,9 +290,14 @@ namespace Prabin_SMS.web.Controllers
         [Route("api/Degree/getSemesterNo")]
         public async Task<IActionResult> getSemesterNo(int DegreeId)
         {
-            var Degree = await _degree.GetAsync(DegreeId);
-            var number = Degree.No_Of_Semesters;
-            return Json(new { number });
+            if (DegreeId != 0)
+            {
+                var Degree = await _degree.GetAsync(DegreeId);
+                var number = Degree.No_Of_Semesters;
+                return Json(new { number });
+            }
+            return Json(1);
+
         }
 
         [HttpGet]

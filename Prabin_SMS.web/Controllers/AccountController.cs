@@ -97,7 +97,7 @@ namespace Prabin_SMS.web.Controllers
                 }
 
                 var user = CreateUser();
-                user.IsActive = true;
+                user.IsActive = false;
                 user.HasEnrolled = true;
                 user.FirstName = registerViewModel.FirstName;
                 user.LastName = registerViewModel.LastName;

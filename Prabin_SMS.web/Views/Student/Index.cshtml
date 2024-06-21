@@ -1,5 +1,6 @@
 ﻿@model Prabin_SMS.Models.ViewModels.StudentViewModel
 @using Microsoft.AspNetCore.Identity
+@using Prabin_SMS.Models.Enum
 @inject SignInManager<ApplicationUser> signInManager
 
 
@@ -82,14 +83,15 @@
                 <tr>
                     <th>S.N.</th>
                     <th>
+                        Email
+                    </th>
+                    <th>
                         First Name
                     </th>
                     <th>
                         Last Name
                     </th>
-                    <th>
-                        Email
-                    </th>
+                    
                     <th>
                         Address
                     </th>
@@ -156,10 +158,10 @@
                                 Not Set
                             </td>
                         }
-                        @if (items.SectionId != 0)
+                        @if (items.SectionId != 0 && items.SectionId !=null)
                         {
                             <td>
-                                @items.SectionId
+                                @Html.Raw((SectionEnum)items.SectionId)
                             </td>
                         }
                         else
