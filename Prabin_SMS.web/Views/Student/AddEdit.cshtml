@@ -169,17 +169,20 @@
                     <img src="~/images/NoPhoto.png" id="NoStuPhoto" class="NoPhoto img-thumbnail align-center addEditInput addEditImgUser" style="height:200px;width:180px;">
                 }
             </div>
-            <div class="row" >
-                <div class="input-group input-file mt-1">
-                    <label class="input-group-btn ">
-                        <span class="btn btn-large btn-secondary">
-                            Upload Photo
-                            <input asp-for="studentPhoto" class="form-control" onchange="readURL(this, '@Model?.studenturl','StuPhoto','NoStuPhoto' )" style="display: none;" />
-                            <span asp-validation-for="studentPhoto" class="text-danger"></span>
-                        </span>
-                    </label>
+            @if (User.IsInRole("ADMIN"))
+            {
+                <div class="row" >
+                    <div class="input-group input-file mt-1">
+                        <label class="input-group-btn ">
+                            <span class="btn btn-large btn-secondary">
+                                Upload Photo
+                                <input asp-for="studentPhoto" class="form-control" onchange="readURL(this, '@Model?.studenturl','StuPhoto','NoStuPhoto' )" style="display: none;" />
+                                <span asp-validation-for="studentPhoto" class="text-danger"></span>
+                            </span>
+                        </label>
+                    </div>
                 </div>
-            </div>
+            }
        
              @if (User.IsInRole("ADMIN"))
             {
