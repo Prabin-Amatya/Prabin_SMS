@@ -449,9 +449,11 @@
                         method: "post",
                         processData: false,
                         contentType: false,
+                        cache: false
                     }
                 ).done(function (data) {
-                    location.reload();
+                    Cache.delete();
+                    location.reload(true);
                 }).fail(function (jqXHR, textStatus, errorThrown) {
                     console.error("AJAX error: " + textStatus + ' : ' + errorThrown);
                     console.error("Response: ", jqXHR.responseText);
