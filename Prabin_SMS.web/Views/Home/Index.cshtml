@@ -1,0 +1,99 @@
+﻿@model IEnumerable<Prabin_SMS.Models.ViewModels.DashboardCountViewModel>
+
+<h3 style="color: #665d5d;     text-align: center;">Enrollment Request Rate(per day)</h3>
+<div class="row">
+    <canvas id="enrollmentChart" width="400" height="170"></canvas>
+</div>
+<br /><br />
+
+<h3 style="color: #665d5d;     text-align: center;">
+    Total Requests Per Degree
+</h3>
+
+<div class="d-flex w-100 justify-content-center">
+<table class="table mt-3 w-75" style="font-family: cursive;color: #665d5d; border-width:0px; border-bottom:none">
+    <thead style="font-size:15.2px; text-align:center">
+        <tr>
+            <th>
+                <h4> Degree Name</h4>
+            </th>
+            <th>
+                <h4> Total Requests</h4>
+            </th>
+        </tr>
+    </thead>
+    <tbody style="font-size:17px;">
+            @foreach (var item in Model)
+            {
+            <tr>
+                <td style="box-shadow: 6px 5px 8px -7px #a79898 ; border-bottom: 2px solid #c7c7c7 !important;">
+                    @item.DegreeName
+                </td>
+                <td style="box-shadow: 6px 5px 8px -7px #a79898; border-bottom: 2px solid #c7c7c7 !important;">
+                    @item.Enrollments
+                </td>
+            </tr>
+            }
+    </tbody>
+    
+</table>
+</div>
+@section Scripts{
+<script>
+        $(document).ready(function () {
+            $.ajax({
+                url: '/api/Home/EnrollmentTrend',
+                method: 'GET',
+                success: function (response) {
+                    console.log(response);
+                    var dates = response.alldate.map(date=>new Date(date));
+                    debugger;
+                    var datasets = response.enrollmentTrend.map((degreeData, index) => ({
+                        label: degreeData.degreeName,
+                        data: degreeData.enrollments,
+                        backgroundColor: '#'+(((parseInt("8BC0C0", 16) + (index * 85)) % 0xFFFFFF).toString(16).toUpperCase().padStart(6,'0')),
+                        borderColor: '#'+(((parseInt("2BC0C0", 16) + (index * 85)) % 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0')),
+                        borderWidth: 1
+                    }));
+                    var enrollmentData = {
+                        labels: dates,
+                        datasets: datasets
+                    };
+
+                    var ctx = $('#enrollmentChart');
+                    var enrollmentChart = new Chart(ctx, {
+                        type: 'line',
+                        data: enrollmentData,
+                        options: {
+                            scales: {
+                                x: {
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day',
+                                        tooltipFormat: 'll'
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Date'
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Enrollments'
+                                    }
+                                }
+                            }
+                        }
+                    });
+                },
+                error: function (error) {
+                    console.log('Error fetching data:', error);
+                }
+            });
+        });
+
+</script>
+}
+

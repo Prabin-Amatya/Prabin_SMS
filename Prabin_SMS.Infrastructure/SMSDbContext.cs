@@ -14,6 +14,8 @@ namespace Prabin_SMS.Infrastructure
     {
         public SMSDbContext(DbContextOptions<SMSDbContext> options):base(options) { }
         public DbSet<UserInfo> UserInfos { get; set; }
+        public DbSet<DashboardCountViewModel> DashboardCountViewModels { get; set; }
+        public DbSet<DashboardCountTrendModel> DashboardCountTrendModels { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
